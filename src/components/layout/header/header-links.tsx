@@ -19,35 +19,60 @@ export function HeaderLinks({ className }: { className?: string }) {
 					'font-normal underline': !!match('/')(pathname)
 				})}
 			>
-				<Link onClick={()=>closeDialog?.()} href='/'>Головна</Link>
+				<Link
+					onClick={() => closeDialog?.()}
+					href='/'
+				>
+					Головна
+				</Link>
 			</li>
 			<li
 				className={clsx('hover:underline underline-offset-4', {
 					'font-normal underline': !!match('/catalog')(pathname)
 				})}
 			>
-				<Link onClick={()=>closeDialog?.()} href='/catalog'>Каталог</Link>
+				<Link
+					onClick={() => closeDialog?.()}
+					href='/catalog'
+				>
+					Каталог
+				</Link>
 			</li>
 			<li
 				className={clsx('hover:underline underline-offset-4', {
 					'font-normal underline': !!match('/about')(pathname)
 				})}
 			>
-				<Link onClick={()=>closeDialog?.()} href='/about'>Про Нас</Link>
+				<Link
+					onClick={() => closeDialog?.()}
+					href='/about'
+				>
+					Про Нас
+				</Link>
 			</li>
 			<li
 				className={clsx('hover:underline underline-offset-4', {
 					'font-normal underline': !!match('/contacts')(pathname)
 				})}
 			>
-				<Link onClick={()=>closeDialog?.()} href='/contacts'>Контакти</Link>
+				<Link
+					onClick={() => closeDialog?.()}
+					href='/contacts'
+				>
+					Контакти
+				</Link>
 			</li>
 			<li
 				className={clsx('hover:underline underline-offset-4', {
 					'font-normal underline': !!match('/buy')(pathname)
 				})}
 			>
-				<Link onClick={()=>closeDialog?.()} href='/buy'>Де купити?</Link>
+				<Link
+					onClick={() => closeDialog?.()}
+					href='/buy'
+				>
+					Де купити?
+				</Link>
 			</li>
 		</ul>
 	)

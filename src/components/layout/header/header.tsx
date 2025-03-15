@@ -7,7 +7,7 @@ import { Dialog } from '@/components/ui/dialog'
 
 export function Header() {
 	return (
-		<header className='py-3'>
+		<header className='py-3 bg-white'>
 			<Container className='flex items-center justify-between'>
 				<Dialog
 					title='Меню'
@@ -22,7 +22,7 @@ export function Header() {
 				>
 					<HeaderLinks className='flex flex-col gap-8' />
 				</Dialog>
-				<Logo />
+				<Logo className='max-md:mr-auto max-md:ml-5' />
 				<HeaderLinks className='max-md:hidden' />
 				<HeaderButtons />
 			</Container>
