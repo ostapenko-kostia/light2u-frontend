@@ -48,10 +48,10 @@ export function Hero() {
 							</p>
 						</Container>
 						<Container className='flex items-start'>
-							<button className='border-black border bg-[#ffffff40] rounded-3xl text-black'>
+							<button className='border-black border bg-[#ffffff40] rounded-lg text-black'>
 								<Link
 									href={'/catalog'}
-									className='w-full h-full block px-20 py-3 max-sm:px-14'
+									className='w-full h-full block px-10 py-3 max-sm:px-14'
 								>
 									Переглянути
 								</Link>

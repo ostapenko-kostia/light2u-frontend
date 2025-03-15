@@ -2,6 +2,8 @@ import { Header } from '@/components/layout/header/header'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { Footer } from '@/components/layout/footer'
+import clsx from 'clsx'
 
 const inter = Inter({
 	variable: '--font-inter',
@@ -20,9 +22,10 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<body className={inter.className}>
+			<body className={clsx('flex flex-col', inter.className)}>
 				<Header />
-				<main>{children}</main>
+				<main className='grow'>{children}</main>
+				<Footer />
 			</body>
 		</html>
 	)

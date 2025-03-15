@@ -19,13 +19,8 @@ export function HomeGallery() {
 			animate={{ opacity: 1, transition: { duration: 1 } }}
 		>
 			<Container>
-				<h2
-					className='text-5xl text-center relative z-10 font-bold uppercase tracking-widest'
-					style={{ textShadow: '0 4px 120px #ffffff11' }}
-				>
-					Галерея
-				</h2>
-				<div className='flex items-center gap-4 w-full'>
+				<h2 className='text-xl uppercase tracking-wide'>Галерея</h2>
+				<div className='flex items-center gap-4 w-full mt-6'>
 					<button
 						onClick={() => swiperRef.current?.swiper.slidePrev()}
 						className='text-black text-xl cursor-pointer border-black max-[500px]:hidden border rounded-full p-2 hover:bg-black hover:text-white transition-all duration-300'
@@ -39,7 +34,7 @@ export function HomeGallery() {
 						breakpoints={{
 							1024: { slidesPerView: 3 },
 							768: { slidesPerView: 2 },
-							0: { slidesPerView: 1 },
+							0: { slidesPerView: 1 }
 						}}
 						modules={[Pagination]}
 						pagination={{ clickable: true }}
