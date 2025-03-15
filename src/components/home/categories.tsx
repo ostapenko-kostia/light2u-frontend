@@ -12,7 +12,7 @@ export function HomeCategories() {
 		>
 			<Container>
 				<h2 className='text-xl uppercase tracking-wide'>Категорії</h2>
-				<section className='grid grid-cols-4 gap-8 w-full pt-6 max-xl:grid-cols-3 max-md:grid-cols-2 max-[450px]:!grid-cols-1'>
+				<section className='grid grid-cols-4 gap-8 w-full pt-6 max-xl:grid-cols-3 max-md:grid-cols-2 max-[350px]:!grid-cols-1'>
 					<article className='w-full h-full group'>
 						<Link
 							href='/catalog'
