@@ -2,8 +2,9 @@
 
 import Select from 'react-select'
 import { customStyles } from './header-select.styles'
+import dynamic from 'next/dynamic'
 
-export function HeaderLangSwitcher({ className }: { className?: string }) {
+function HeaderLangSwitcherComponent({ className }: { className?: string }) {
 	return (
 		<Select
 			className={className}
@@ -17,3 +18,7 @@ export function HeaderLangSwitcher({ className }: { className?: string }) {
 		/>
 	)
 }
+
+export const HeaderLangSwitcher = dynamic(() => Promise.resolve(HeaderLangSwitcherComponent), {
+	ssr: false
+})
