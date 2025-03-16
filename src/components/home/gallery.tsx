@@ -49,6 +49,7 @@ export function HomeGallery() {
 								alt='test'
 								width={1000}
 								height={1000}
+								loading='lazy'
 								className='w-full h-full object-cover'
 							/>
 						</SwiperSlide>
@@ -58,6 +59,7 @@ export function HomeGallery() {
 								alt='test'
 								width={1000}
 								height={1000}
+								loading='lazy'
 								className='w-full h-full object-cover'
 							/>
 						</SwiperSlide>
@@ -67,6 +69,7 @@ export function HomeGallery() {
 								alt='test'
 								width={1000}
 								height={1000}
+								loading='lazy'
 								className='w-full h-full object-cover'
 							/>
 						</SwiperSlide>
