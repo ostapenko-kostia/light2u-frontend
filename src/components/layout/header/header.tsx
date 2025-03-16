@@ -4,6 +4,7 @@ import { Container } from '../container'
 import { HeaderButtons } from './header-buttons'
 import { HeaderLinks } from './header-links'
 import { Dialog } from '@/components/ui/dialog'
+import { HeaderLangSwitcher } from './header-lang-switcher'
 
 export function Header() {
 	return (
@@ -24,7 +25,10 @@ export function Header() {
 				</Dialog>
 				<Logo className='max-md:mr-auto max-md:ml-5' />
 				<HeaderLinks className='max-md:hidden' />
-				<HeaderButtons />
+				<div className='flex items-center gap-4'>
+					<HeaderButtons />
+					<HeaderLangSwitcher />
+				</div>
 			</Container>
 		</header>
 	)
