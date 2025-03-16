@@ -22,11 +22,12 @@ export function Header() {
 					}
 				>
 					<HeaderLinks className='flex flex-col gap-8' />
+					<HeaderButtons className='flex gap-2 mt-6 justify-center items-center' />
 				</Dialog>
 				<Logo className='max-md:mr-auto max-md:ml-5' />
 				<HeaderLinks className='max-md:hidden' />
-				<div className='flex items-center gap-4'>
-					<HeaderButtons />
+				<div className='flex items-center gap-2'>
+					<HeaderButtons className='max-md:hidden' />
 					<HeaderLangSwitcher />
 				</div>
 			</Container>

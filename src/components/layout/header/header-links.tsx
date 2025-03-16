@@ -13,7 +13,7 @@ export function HeaderLinks({ className }: { className?: string }) {
 	const closeDialog = dialogValues?.closeDialog
 
 	return (
-		<ul className={clsx(className, 'flex items-center gap-8 font-light tracking-wider')}>
+		<ul className={clsx(className, 'flex items-center gap-6 font-light tracking-wider')}>
 			<li
 				className={clsx('hover:underline underline-offset-4', {
 					'font-normal underline': !!match('/')(pathname)
