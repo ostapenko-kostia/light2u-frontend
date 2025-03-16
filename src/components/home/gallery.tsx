@@ -15,8 +15,9 @@ export function HomeGallery() {
 	return (
 		<motion.div
 			className='py-12'
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1, transition: { duration: 1 } }}
+			initial={{ translateY: '15px', opacity: 0 }}
+			animate={{ translateY: '0px', opacity: 1 }}
+			transition={{ duration: 0.7, ease: 'anticipate' }}
 		>
 			<Container>
 				<h2 className='text-xl uppercase tracking-wide'>Галерея</h2>

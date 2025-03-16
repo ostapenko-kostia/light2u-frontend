@@ -11,8 +11,9 @@ import { Container } from '../layout/container'
 export function Hero() {
 	return (
 		<motion.div
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1, transition: { duration: 1 } }}
+			initial={{ translateY: '15px', opacity: 0 }}
+			animate={{ translateY: '0px', opacity: 1 }}
+			transition={{ duration: 0.7, ease: 'anticipate' }}
 			className='h-[60vh]'
 		>
 			<Swiper
