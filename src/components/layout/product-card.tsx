@@ -4,21 +4,32 @@ import Link from 'next/link'
 interface ProductCardProps {
 	product: {
 		id: number
+		slug: string
 		name: string
-		imageUrl: string
+		images: string[]
+		description: string
 		price: number
+		category: string
+		materials: string
+		dimensions: string
+		weight: string
+		power: string
+		voltage: number
+		bulb: string
+		bulbColor: string
+		bulbType: string
 	}
 }
 export function ProductCard({ product }: ProductCardProps) {
 	return (
 		<Link
-			href={`/product/${product.id}`}
+			href={`/product/${product.slug}`}
 			className='contents'
 		>
 			<article className='flex flex-col gap-4 w-full group'>
 				<div className='overflow-hidden w-full h-auto rounded-xl'>
 					<Image
-						src={product.imageUrl}
+						src={product.images[0]}
 						alt={product.name}
 						width={500}
 						height={500}

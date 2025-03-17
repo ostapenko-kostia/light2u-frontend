@@ -7,8 +7,20 @@ export default function CatalogPage() {
 	const products = [
 		{
 			id: 1,
+			slug: 'ceiling-lamp-bubble-l',
 			name: 'Ceiling Lamp Bubble L',
-			imageUrl: '/test6.webp',
+			description:
+				'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis rerum iste pariatur cum quia et temporibus nostrum voluptas eaque, impedit culpa a nemo est commodi magni praesentium vero maxime ducimus consectetur adipisicing elit. Perspiciatis rerum iste pariatur cum!',
+			images: ['/test6.webp', '/test5.webp', '/test4.webp'],
+			category: 'Лампи',
+			materials: 'Сталь, скло',
+			dimensions: '100x100x100 см',
+			weight: '1 кг',
+			power: '100 Вт',
+			voltage: 220,
+			bulb: '100 Вт',
+			bulbColor: 'Білий',
+			bulbType: 'LED',
 			price: 4800
 		}
 	]
