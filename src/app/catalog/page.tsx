@@ -10,9 +10,13 @@ export default async function CatalogPage({
 }: {
 	searchParams: Promise<{ category: string }>
 }) {
-	const { category } = await searchParams
+	const params = await searchParams
+	const category = params?.category?.trim()?.length ? params.category : ''
 
 	const products = (await productsService.getAllProducts())?.data
+	const filteredProducts = category.length
+		? products?.filter(i => i.categorySlug === category)
+		: products
 	const categories = (await categoriesService.getAllCategories())?.data
 
 	const categoryName = category
@@ -54,7 +58,7 @@ export default async function CatalogPage({
 					transition={{ duration: 0.7, ease: 'anticipate' }}
 					className='grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 max-[400px]:!grid-cols-1 gap-6 w-full mt-12'
 				>
-					{products?.map(product => (
+					{filteredProducts?.map(product => (
 						<ProductCard
 							key={product.id}
 							product={product}

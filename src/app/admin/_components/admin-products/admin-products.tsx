@@ -28,7 +28,7 @@ export function AdminProductsTab({ products, categories }: Props) {
 									className='relative max-[500px]:pr-0'
 									key={product.id}
 								>
-									<div className='absolute w-full z-10 bg-[#fffffffd] flex border items-center justify-around max-[500px]:gap-4 max-[500px]:justify-between p-2 left-0 top-0 rounded-md'>
+									<div className='absolute w-1/2 z-10 flex items-center justify-around max-[500px]:gap-4 max-[500px]:justify-between p-0 right-0 bottom-0 rounded-md'>
 										<AdminProductInfo
 											product={product}
 											categoryName={categoryName}

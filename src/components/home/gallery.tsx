@@ -9,8 +9,9 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import { useRef } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { Gallery } from '@prisma/client'
 
-export function HomeGallery() {
+export function HomeGallery({ galleries }: { galleries: Gallery[] | undefined }) {
 	const swiperRef = useRef<SwiperRef>(null)
 	return (
 		<motion.div
@@ -43,36 +44,18 @@ export function HomeGallery() {
 						navigation={{ nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }}
 						className='w-full h-auto min-h-[400px]'
 					>
-						<SwiperSlide className='w-full h-full'>
-							<Image
-								src='/test3.webp'
-								alt='test'
-								width={1000}
-								height={1000}
-								loading='lazy'
-								className='w-full h-full object-cover'
-							/>
-						</SwiperSlide>
-						<SwiperSlide className='w-full h-full'>
-							<Image
-								src='/test4.webp'
-								alt='test'
-								width={1000}
-								height={1000}
-								loading='lazy'
-								className='w-full h-full object-cover'
-							/>
-						</SwiperSlide>
-						<SwiperSlide className='w-full h-full'>
-							<Image
-								src='/test5.webp'
-								alt='test'
-								width={1000}
-								height={1000}
-								loading='lazy'
-								className='w-full h-full object-cover'
-							/>
-						</SwiperSlide>
+						{galleries?.map((gallery, index) => (
+							<SwiperSlide className='w-full h-full'>
+								<Image
+									src={gallery.image}
+									alt={`Картинка ${index + 1}`}
+									width={1000}
+									height={1000}
+									loading='lazy'
+									className='w-full h-full object-cover'
+								/>
+							</SwiperSlide>
+						))}
 					</Swiper>
 					<button
 						onClick={() => swiperRef.current?.swiper.slideNext()}

@@ -68,7 +68,7 @@ export function AdminStorageControlTab({ files }: Props) {
 										<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
 											{new Date(file.createdAt).toLocaleDateString()}
 										</td>
-										<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+										<td className='px-6 py-4 justify-center h-full whitespace-nowrap text-sm text-gray-500'>
 											<CopyFileUrl file={file} />
 											<DeleteFile file={file} />
 										</td>

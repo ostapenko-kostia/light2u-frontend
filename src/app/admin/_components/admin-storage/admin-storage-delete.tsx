@@ -26,6 +26,7 @@ export function DeleteFile({ file }: Props) {
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['storage get'] })
+			toast.success('Успішно! Файл буде видалений протягом 5 хвилин', { duration: 3000 })
 			closeDialog?.()
 		}
 		if (isError) {
@@ -37,7 +38,7 @@ export function DeleteFile({ file }: Props) {
 	return (
 		<Dialog
 			title='Видалити файл'
-			trigger={<button className='text-red-600 hover:text-red-900'>Видалити</button>}
+			trigger={<button className='text-red-600 hover:text-red-900 ml-4'>Видалити</button>}
 		>
 			<div className='mx-auto bg-white rounded-md p-4 w-[400px] h-min flex flex-col gap-8 max-sm:w-[90%]'>
 				<p>Ви дійсно хочете видалити файл {file.title}?</p>

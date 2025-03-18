@@ -12,6 +12,10 @@ import { useGetCategories } from '@/hooks/useCategories'
 import { useGetAdmins } from '@/hooks/useAdmin'
 import { useGetFiles } from '@/hooks/useStorage'
 import { useGetTexts } from '@/hooks/useText'
+import { AdminSlidesTab } from './admin-slides/admin-slides'
+import { useGetSlides } from '@/hooks/useSlides'
+import { AdminGalleryTab } from './admin-gallery/admin-gallery'
+import { useGetGallery } from '@/hooks/useGallery'
 
 function AdminComponent() {
 	const { data: products } = useGetProducts()
@@ -19,6 +23,8 @@ function AdminComponent() {
 	const { data: texts } = useGetTexts()
 	const { data: admins } = useGetAdmins()
 	const { data: files } = useGetFiles()
+	const { data: slides } = useGetSlides()
+	const { data: galleries } = useGetGallery()
 
 	const [currentTab, setCurrentTab] = useState(0)
 
@@ -31,6 +37,8 @@ function AdminComponent() {
 			categories={categories}
 			products={products}
 		/>,
+		<AdminSlidesTab slides={slides} />,
+		<AdminGalleryTab galleries={galleries} />,
 		<AdminsTab admins={admins} />,
 		<AdminTextFieldsTab texts={texts} />,
 		<AdminStorageControlTab files={files} />
@@ -55,18 +63,30 @@ function AdminComponent() {
 					</li>
 					<li
 						onClick={() => setCurrentTab(2)}
+						className='text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer'
+					>
+						Слайди
+					</li>
+					<li
+						onClick={() => setCurrentTab(3)}
+						className='text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer'
+					>
+						Галерея
+					</li>
+					<li
+						onClick={() => setCurrentTab(4)}
 						className='text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer'
 					>
 						Адміністратори
 					</li>
 					<li
-						onClick={() => setCurrentTab(3)}
+						onClick={() => setCurrentTab(5)}
 						className='text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer'
 					>
 						Текстові поля
 					</li>
 					<li
-						onClick={() => setCurrentTab(4)}
+						onClick={() => setCurrentTab(6)}
 						className='text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer'
 					>
 						Керування сховищем

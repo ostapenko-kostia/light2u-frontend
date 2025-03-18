@@ -2,11 +2,9 @@ import * as motion from 'framer-motion/client'
 import { Container } from '../layout/container'
 import Image from 'next/image'
 import Link from 'next/link'
-import { categoriesService } from '@/services/categories.service'
+import { Category } from '@prisma/client'
 
-export async function HomeCategories() {
-	const categories = (await categoriesService.getAllCategories())?.data
-
+export async function HomeCategories({ categories }: { categories: Category[] | undefined }) {
 	return (
 		<motion.div
 			className='py-12'
@@ -23,7 +21,7 @@ export async function HomeCategories() {
 							key={category.id}
 						>
 							<Link
-								href='/catalog'
+								href={`/catalog?category=${category.slug}`}
 								className='w-full h-full flex flex-col gap-3'
 							>
 								<div className='relative w-full h-full rounded-sm aspect-square overflow-hidden'>

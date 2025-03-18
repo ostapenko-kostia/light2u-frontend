@@ -76,3 +76,24 @@ model FailedLoginAttempt {
 
   updatedAt DateTime @updatedAt
 }
+
+model Slide {
+  id Int @id @unique @default(autoincrement())
+
+  background  String
+  description String
+  text        String
+  url         String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Gallery {
+  id Int @id @unique @default(autoincrement())
+
+  image String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
