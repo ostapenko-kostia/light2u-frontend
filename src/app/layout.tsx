@@ -4,7 +4,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Footer } from '@/components/layout/footer'
 import clsx from 'clsx'
-
+import Provider from './providers'
+import { Toaster } from 'react-hot-toast'
 const inter = Inter({
 	variable: '--font-inter',
 	subsets: ['latin', 'cyrillic']
@@ -23,9 +24,12 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			<body className={clsx('flex flex-col', inter.className)}>
-				<Header />
-				<main className='grow'>{children}</main>
-				<Footer />
+				<Provider>
+					<Toaster containerStyle={{ zIndex: 10000 }} />
+					<Header />
+					<main className='grow'>{children}</main>
+					<Footer />
+				</Provider>
 			</body>
 		</html>
 	)

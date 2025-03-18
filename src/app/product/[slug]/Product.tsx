@@ -30,9 +30,9 @@ export function Product({
 				<p className='text-2xl font-light'>₴{product.price} грн</p>
 			</div>
 
-			<p className='text-md mt-2	 font-light'>{product.description}</p>
+			<p className='text-md mt-2 font-light'>{product.description}</p>
 
-			<Link href='/buy'>
+			<Link href='/contacts'>
 				<button className='border-black border hover:bg-black hover:text-white transition-colors duration-200 cursor-pointer py-3 rounded-lg mt-8 w-full'>
 					Як замовити?
 				</button>

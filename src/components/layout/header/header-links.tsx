@@ -62,18 +62,6 @@ export function HeaderLinks({ className }: { className?: string }) {
 					Контакти
 				</Link>
 			</li>
-			<li
-				className={clsx('hover:underline underline-offset-4', {
-					'font-normal underline': !!match('/buy')(pathname)
-				})}
-			>
-				<Link
-					onClick={() => closeDialog?.()}
-					href='/buy'
-				>
-					Де купити?
-				</Link>
-			</li>
 		</ul>
 	)
 }

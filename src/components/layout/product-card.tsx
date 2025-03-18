@@ -1,24 +1,9 @@
+import { Product } from '@prisma/client'
 import Image from 'next/image'
 import Link from 'next/link'
 
 interface ProductCardProps {
-	product: {
-		id: number
-		slug: string
-		name: string
-		images: string[]
-		description: string
-		price: number
-		category: string
-		materials: string
-		dimensions: string
-		weight: string
-		power: string
-		voltage: number
-		bulb: string
-		bulbColor: string
-		bulbType: string
-	}
+	product: Product
 }
 export function ProductCard({ product }: ProductCardProps) {
 	return (

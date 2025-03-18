@@ -1,0 +1,51 @@
+import { handleApiError } from '@/app/api/exceptions/handleApiError'
+import { prisma } from '@/prisma/prisma-client'
+import { NextRequest, NextResponse } from 'next/server'
+import Joi from 'joi'
+import { ApiError } from '@/app/api/exceptions/apiError'
+import slugify from '@sindresorhus/slugify'
+import { checkIsAdmin } from '../../admin/auth/utils/checkIsAdmin'
+
+const catSchema = Joi.object({
+	name: Joi.string().min(1).required().messages({
+		'string.empty': 'Name is required',
+		'any.required': 'Name is required'
+	})
+})
+
+export async function POST(req: NextRequest) {
+	try {
+		const body = await req.json()
+		const { error, value } = catSchema.validate(body, { abortEarly: false })
+
+		if (error) {
+			const errorDetails = error.details.map(err => err.message).join(', ')
+			throw new ApiError(`Validation error: ${errorDetails}`, 400)
+		}
+
+		value.slug = slugify(value.name)
+		const existingCategory = await prisma.category.findUnique({ where: { slug: value.slug } })
+
+		if (existingCategory) {
+			throw new ApiError(`Така категорія вже існує`, 400)
+		}
+
+		const isAdmin = await checkIsAdmin(req)
+
+		if (!isAdmin) throw new ApiError('You are not admin', 403)
+
+		const cat = await prisma.category.create({ data: value })
+
+		return NextResponse.json(
+			{ ok: true, category: cat },
+			{
+				status: 200,
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}
+		)
+	} catch (error) {
+		return handleApiError(error)
+	}
+}
