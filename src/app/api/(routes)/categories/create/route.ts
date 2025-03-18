@@ -1,29 +1,39 @@
+import { ApiError } from '@/app/api/exceptions/apiError'
 import { handleApiError } from '@/app/api/exceptions/handleApiError'
 import { prisma } from '@/prisma/prisma-client'
-import { NextRequest, NextResponse } from 'next/server'
-import Joi from 'joi'
-import { ApiError } from '@/app/api/exceptions/apiError'
 import slugify from '@sindresorhus/slugify'
+import Joi from 'joi'
+import { NextRequest, NextResponse } from 'next/server'
 import { checkIsAdmin } from '../../admin/auth/utils/checkIsAdmin'
+import { saveFile } from '@/app/api/utils/saveFile'
 
 const catSchema = Joi.object({
-	name: Joi.string().min(1).required().messages({
-		'string.empty': 'Name is required',
-		'any.required': 'Name is required'
+	ru: Joi.string().min(1).required().messages({
+		'string.empty': 'Russian name is required',
+		'any.required': 'Russian name is required'
+	}),
+	ua: Joi.string().min(1).required().messages({
+		'string.empty': 'Ukrainian name is required',
+		'any.required': 'Ukrainian name is required'
 	})
 })
 
 export async function POST(req: NextRequest) {
 	try {
-		const body = await req.json()
-		const { error, value } = catSchema.validate(body, { abortEarly: false })
+		const formData = await req.formData()
+		const body = Object.fromEntries(formData)
+
+		const name = JSON.parse(body.name as string)
+		const image = formData.get('image') as File
+
+		const { error, value } = catSchema.validate(name, { abortEarly: false })
 
 		if (error) {
 			const errorDetails = error.details.map(err => err.message).join(', ')
 			throw new ApiError(`Validation error: ${errorDetails}`, 400)
 		}
 
-		value.slug = slugify(value.name)
+		value.slug = slugify(name.ua)
 		const existingCategory = await prisma.category.findUnique({ where: { slug: value.slug } })
 
 		if (existingCategory) {
@@ -34,7 +44,22 @@ export async function POST(req: NextRequest) {
 
 		if (!isAdmin) throw new ApiError('You are not admin', 403)
 
-		const cat = await prisma.category.create({ data: value })
+		let savedImage: string
+
+		if (image && image.type?.startsWith('image/')) {
+			const savedPath = await saveFile(image, req)
+			savedImage = savedPath
+		} else {
+			throw new ApiError('Each image must be of type image/*', 400)
+		}
+
+		const cat = await prisma.category.create({
+			data: {
+				slug: value.slug,
+				name,
+				image: savedImage
+			}
+		})
 
 		return NextResponse.json(
 			{ ok: true, category: cat },

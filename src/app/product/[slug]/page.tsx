@@ -3,27 +3,20 @@ import Image from 'next/image'
 import { Product } from './Product'
 import { ProductCard } from '@/components/layout/product-card'
 import * as motion from 'framer-motion/client'
+import { productsService } from '@/services/products.service'
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
 	const { slug } = await params
 
-	const product = {
-		id: 1,
-		slug: 'ceiling-lamp-bubble-l',
-		name: 'Ceiling Lamp Bubble L',
-		description:
-			'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis rerum iste pariatur cum quia et temporibus nostrum voluptas eaque, impedit culpa a nemo est commodi magni praesentium vero maxime ducimus consectetur adipisicing elit. Perspiciatis rerum iste pariatur cum!',
-		images: ['/test6.webp', '/test5.webp', '/test4.webp'],
-		category: 'Лампи',
-		materials: 'Сталь, скло',
-		dimensions: '100x100x100 см',
-		weight: '1 кг',
-		power: '100 Вт',
-		voltage: 220,
-		bulb: '100 Вт',
-		bulbColor: 'Білий',
-		bulbType: 'LED',
-		price: 4800
+	const products = (await productsService.getAllProducts())?.data
+	const product = products?.find(p => p.slug === slug)
+
+	const sameProducts = products
+		?.filter(p => p.categorySlug === product?.categorySlug)
+		.filter(i => i.id !== product?.id)
+
+	if (!product) {
+		return <div>Product not found</div>
 	}
 
 	return (
@@ -59,15 +52,19 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 					<Product product={product} />
 				</div>
 			</Container>
-			<Container className='flex flex-col gap-4 mt-8'>
-				<h2 className='text-2xl font-medium text-[#121212cc]'>Схожі товари</h2>
-				<div className='grid grid-cols-4 gap-4 max-md:grid-cols-2 max-[500px]:!grid-cols-1'>
-					<ProductCard product={product} />
-					<ProductCard product={product} />
-					<ProductCard product={product} />
-					<ProductCard product={product} />
-				</div>
-			</Container>
+			{sameProducts && sameProducts.length > 0 && (
+				<Container className='flex flex-col gap-4 mt-8'>
+					<h2 className='text-2xl font-medium text-[#121212cc]'>Схожі товари</h2>
+					<div className='grid grid-cols-4 gap-4 max-md:grid-cols-2 max-[500px]:!grid-cols-1'>
+						{sameProducts?.map(product => (
+							<ProductCard
+								product={product}
+								key={product.id}
+							/>
+						))}
+					</div>
+				</Container>
+			)}
 		</motion.section>
 	)
 }

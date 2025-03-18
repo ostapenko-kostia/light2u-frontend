@@ -16,8 +16,20 @@ export function useGetCategories() {
 export function useCreateCategory() {
 	return useMutation({
 		mutationKey: ['category create'],
-		mutationFn: async ({ name }: { name: string }) => {
-			const res = await categoriesService.createCategory(name)
+		mutationFn: async ({
+			nameRu,
+			image,
+			nameUa
+		}: {
+			image: FileList
+			nameUa: string
+			nameRu: string
+		}) => {
+			const name = {
+				ru: nameRu,
+				ua: nameUa
+			}
+			const res = await categoriesService.createCategory({ image, name })
 			if (!res?.data) return Promise.reject()
 			return res
 		}
@@ -27,7 +39,12 @@ export function useCreateCategory() {
 export function useEditCategory() {
 	return useMutation({
 		mutationKey: ['category edit'],
-		mutationFn: async (data: { id: number; name: string }) => {
+		mutationFn: async (data: {
+			id: number
+			image?: FileList
+			nameUa?: string
+			nameRu?: string
+		}) => {
 			const res = await categoriesService.editCategory(data)
 			if (!res?.data) return Promise.reject()
 			return res

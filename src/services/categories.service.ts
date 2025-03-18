@@ -10,12 +10,32 @@ class CategoriesService {
 		} catch {}
 	}
 
-	async createCategory(name: string) {
-		return await api.post('/categories/create', { name })
+	async createCategory({ name, image }: { name: { ua: string; ru: string }; image: FileList }) {
+		const formData = new FormData()
+		formData.append('name', JSON.stringify(name))
+		formData.append('image', image[0])
+		return await api.post('/categories/create', formData, {
+			headers: { 'Content-Type': 'multipart/form-data' }
+		})
 	}
 
-	async editCategory({ id, name }: { id: number; name: string }) {
-		return await api.put(`/categories/edit/${id}`, { name })
+	async editCategory({
+		id,
+		nameUa,
+		nameRu,
+		image
+	}: {
+		id: number
+		nameUa?: string
+		nameRu?: string
+		image?: FileList
+	}) {
+		const formData = new FormData()
+		formData.append('name', JSON.stringify({ ua: nameUa, ru: nameRu }))
+		if (image) formData.append('image', image[0])
+		return await api.put(`/categories/edit/${id}`, formData, {
+			headers: { 'Content-Type': 'multipart/form-data' }
+		})
 	}
 
 	async deleteCategory(id: number) {

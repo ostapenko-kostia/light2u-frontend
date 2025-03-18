@@ -36,7 +36,8 @@ model Category {
   id   Int    @id @unique @default(autoincrement())
   slug String @unique
 
-  name String
+  image String
+  name  Json
 
   products Product[]
 

@@ -2,28 +2,23 @@ import { Container } from '@/components/layout/container'
 import { ProductCard } from '@/components/layout/product-card'
 import Link from 'next/link'
 import * as motion from 'framer-motion/client'
+import { categoriesService } from '@/services/categories.service'
+import { productsService } from '@/services/products.service'
 
-export default function CatalogPage() {
-	const products = [
-		{
-			id: 1,
-			slug: 'ceiling-lamp-bubble-l',
-			name: 'Ceiling Lamp Bubble L',
-			description:
-				'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis rerum iste pariatur cum quia et temporibus nostrum voluptas eaque, impedit culpa a nemo est commodi magni praesentium vero maxime ducimus consectetur adipisicing elit. Perspiciatis rerum iste pariatur cum!',
-			images: ['/test6.webp', '/test5.webp', '/test4.webp'],
-			category: 'Лампи',
-			materials: 'Сталь, скло',
-			dimensions: '100x100x100 см',
-			weight: '1 кг',
-			power: '100 Вт',
-			voltage: 220,
-			bulb: '100 Вт',
-			bulbColor: 'Білий',
-			bulbType: 'LED',
-			price: 4800
-		}
-	]
+export default async function CatalogPage({
+	searchParams
+}: {
+	searchParams: Promise<{ category: string }>
+}) {
+	const { category } = await searchParams
+
+	const products = (await productsService.getAllProducts())?.data
+	const categories = (await categoriesService.getAllCategories())?.data
+
+	const categoryName = category
+		? (categories?.find(c => c.slug === category)?.name as any).ua
+		: null
+
 	return (
 		<section className='py-12'>
 			<Container>
@@ -33,7 +28,7 @@ export default function CatalogPage() {
 					transition={{ duration: 0.7, ease: 'anticipate' }}
 					className='text-4xl uppercase tracking-wide'
 				>
-					Всі товари
+					{category ? categoryName : 'Всі товари'}
 				</motion.h1>
 				<motion.ul
 					initial={{ translateY: '15px', opacity: 0 }}
@@ -44,24 +39,14 @@ export default function CatalogPage() {
 					<li className='hover:underline underline-offset-4'>
 						<Link href='/catalog'>Всі</Link>
 					</li>
-					<li className='hover:underline underline-offset-4'>
-						<Link href='/catalog?category=lamps'>Ванна</Link>
-					</li>
-					<li className='hover:underline underline-offset-4'>
-						<Link href='/catalog?category=rings'>Кільця</Link>
-					</li>
-					<li className='hover:underline underline-offset-4'>
-						<Link href='/catalog?category=tracks'>Треки</Link>
-					</li>
-					<li className='hover:underline underline-offset-4'>
-						<Link href='/catalog?category=spotlights'>Споти</Link>
-					</li>
-					<li className='hover:underline underline-offset-4'>
-						<Link href='/catalog?category=lusters'>Люстри</Link>
-					</li>
-					<li className='hover:underline underline-offset-4'>
-						<Link href='/catalog?category=lamps'>Лампи</Link>
-					</li>
+					{categories?.map(category => (
+						<li
+							className='hover:underline underline-offset-4'
+							key={category.id}
+						>
+							<Link href={`/catalog?category=${category.slug}`}>{(category.name as any).ua}</Link>
+						</li>
+					))}
 				</motion.ul>
 				<motion.section
 					initial={{ translateY: '15px', opacity: 0 }}
@@ -69,18 +54,12 @@ export default function CatalogPage() {
 					transition={{ duration: 0.7, ease: 'anticipate' }}
 					className='grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 max-[400px]:!grid-cols-1 gap-6 w-full mt-12'
 				>
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
-					<ProductCard product={products[0]} />
+					{products?.map(product => (
+						<ProductCard
+							key={product.id}
+							product={product}
+						/>
+					))}
 				</motion.section>
 			</Container>
 		</section>

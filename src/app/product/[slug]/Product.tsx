@@ -1,28 +1,9 @@
 'use client'
 
+import { Product as ProductType } from '@prisma/client'
 import Link from 'next/link'
 
-export function Product({
-	product
-}: {
-	product: {
-		id: number
-		slug: string
-		name: string
-		images: string[]
-		description: string
-		price: number
-		category: string
-		materials: string
-		dimensions: string
-		weight: string
-		power: string
-		voltage: number
-		bulb: string
-		bulbColor: string
-		bulbType: string
-	}
-}) {
+export function Product({ product }: { product: ProductType }) {
 	return (
 		<>
 			<div>

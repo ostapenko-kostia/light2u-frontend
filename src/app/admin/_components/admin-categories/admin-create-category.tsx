@@ -1,6 +1,7 @@
 'use client'
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { FileInput } from '@/components/ui/file-input'
 import { useCreateCategory } from '@/hooks/useCategories'
 import { useQueryClient } from '@tanstack/react-query'
 import { PlusIcon } from 'lucide-react'
@@ -9,12 +10,14 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 interface Form {
-	name: string
+	image: FileList
+	nameUa: string
+	nameRu: string
 }
 
 export function AdminCreateCategory() {
 	const [loadingToastId, setLoadingToastId] = useState('')
-	const { register, handleSubmit } = useForm<Form>()
+	const { register, handleSubmit, setValue } = useForm<Form>()
 	const queryClient = useQueryClient()
 	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useCreateCategory()
 
@@ -54,12 +57,24 @@ export function AdminCreateCategory() {
 				className='mx-auto bg-white rounded-md p-4 w-[400px] h-min flex flex-col gap-8 max-sm:w-[90%]'
 				onSubmit={handleSubmit(data => createFunc(data))}
 			>
+				<div>
+					<FileInput
+						label='Зображення'
+						multiple={false}
+						accept='image/*'
+						onChange={file => {
+							if (file) {
+								setValue('image', file)
+							}
+						}}
+					/>
+				</div>
 				<div className='flex items-start flex-col gap-3'>
 					<label
 						htmlFor='cat'
 						className='flex items-center gap-2'
 					>
-						Назва
+						Назва (укр)
 					</label>
 					<input
 						className='w-full rounded-md border border-gray-500 bg-white px-5 py-3 text-sm placeholder:text-gray-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
@@ -67,7 +82,23 @@ export function AdminCreateCategory() {
 						required
 						placeholder='Категорія'
 						id='cat'
-						{...register('name', { required: true })}
+						{...register('nameUa', { required: true })}
+					/>
+				</div>
+				<div className='flex items-start flex-col gap-3'>
+					<label
+						htmlFor='cat'
+						className='flex items-center gap-2'
+					>
+						Назва (рус)
+					</label>
+					<input
+						className='w-full rounded-md border border-gray-500 bg-white px-5 py-3 text-sm placeholder:text-gray-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
+						type='text'
+						required
+						placeholder='Категорія'
+						id='cat'
+						{...register('nameRu', { required: true })}
 					/>
 				</div>
 				<button

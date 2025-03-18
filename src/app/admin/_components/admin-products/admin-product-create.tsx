@@ -126,7 +126,7 @@ export function AdminProductCreate({ categories }: Props) {
 								key={category.id}
 								value={category.slug}
 							>
-								{category.name}
+								{(category.name as any).ua}
 							</option>
 						))}
 					</Select>

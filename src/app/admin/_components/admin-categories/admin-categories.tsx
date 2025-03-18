@@ -62,7 +62,7 @@ export function AdminCategoriesTab({ categories, products }: Props) {
 							<tr key={category.id}>
 								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>{category.id}</td>
 								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-									{category.name}
+									{(category.name as any).ua}
 								</td>
 								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
 									{category.slug}
