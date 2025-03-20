@@ -18,11 +18,27 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            set -e  # Завершуємо виконання при першій помилці
+            
+            # Переконуємося, що Bun і PM2 доступні
+            export PATH="/root/.nvm/versions/node/v22.14.0/bin:$PATH"
+
+            # Переходимо в папку проєкту
             cd /home/light2u.com.ua
+
+            # Оновлюємо код
             git pull origin main
-            /root/.nvm/versions/node/v22.14.0/bin/bun install
+
+            # Встановлюємо залежності
+            /root/.nvm/versions/node/v22.14.0/bin/bun install --silent
+
+            # Генеруємо Prisma клієнт
             npx prisma generate
-            /root/.nvm/versions/node/v22.14.0/bin/bun run build
+
+            # Збираємо проєкт
+            /root/.nvm/versions/node/v22.14.0/bin/bun run build --silent
+
+            # Перезапускаємо сервер через PM2
             /root/.nvm/versions/node/v22.14.0/bin/pm2 restart light2u-app
           EOF
