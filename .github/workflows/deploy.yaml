@@ -21,8 +21,8 @@ jobs:
           sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd /home/light2u.com.ua
             git pull origin main
-            bun install
+            npx bun install
             npx prisma generate
-            bun run build
-            pm2 restart light2u-app
+            npx bun run build
+            npx pm2 restart light2u-app
           EOF
