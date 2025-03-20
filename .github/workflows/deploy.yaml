@@ -37,7 +37,7 @@ jobs:
             npx prisma generate
 
             # Збираємо проєкт
-            /root/.nvm/versions/node/v22.14.0/bin/bun run build --silent
+            /root/.nvm/versions/node/v22.14.0/bin/bun run build
 
             # Перезапускаємо сервер через PM2
             /root/.nvm/versions/node/v22.14.0/bin/pm2 restart light2u-app
