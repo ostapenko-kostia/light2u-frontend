@@ -19,17 +19,10 @@ jobs:
       - name: Deploy to Server
         run: |
           sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            export PATH="$HOME/.bun/bin:$(npm root -g):$PATH"
-
             cd /home/light2u.com.ua
-
             git pull origin main
-
-            bun install
-
+            /root/.nvm/versions/node/v22.14.0/bin/bun install
             npx prisma generate
-
-            bun run build
-
-            npx pm2 restart light2u-app
+            /root/.nvm/versions/node/v22.14.0/bin/bun run build
+            /root/.nvm/versions/node/v22.14.0/bin/pm2 restart light2u-app
           EOF
