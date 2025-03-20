@@ -1,26 +1,31 @@
 import { Container } from '@/components/layout/container'
 import { ProductCard } from '@/components/layout/product-card'
-import Link from 'next/link'
-import * as motion from 'framer-motion/client'
+import { getServerTranslation } from '@/lib/server-translation'
 import { categoriesService } from '@/services/categories.service'
 import { productsService } from '@/services/products.service'
+import * as motion from 'framer-motion/client'
+import Link from 'next/link'
 
 export default async function CatalogPage({
-	searchParams
+	searchParams,
+	params
 }: {
 	searchParams: Promise<{ category: string }>
+	params: Promise<{ locale: string }>
 }) {
-	const params = await searchParams
-	const category = params?.category?.trim()?.length ? params.category : ''
+	const { category } = await searchParams
+	const { locale } = await params
+
+	const { t } = await getServerTranslation(locale)
 
 	const products = (await productsService.getAllProducts())?.data
-	const filteredProducts = category.length
+	const filteredProducts = category?.length
 		? products?.filter(i => i.categorySlug === category)
 		: products
 	const categories = (await categoriesService.getAllCategories())?.data
 
 	const categoryName = category
-		? (categories?.find(c => c.slug === category)?.name as any).ua
+		? (categories?.find(c => c.slug === category)?.name as any)[locale]
 		: null
 
 	return (
@@ -32,7 +37,7 @@ export default async function CatalogPage({
 					transition={{ duration: 0.7, ease: 'anticipate' }}
 					className='text-4xl uppercase tracking-wide'
 				>
-					{category ? categoryName : 'Всі товари'}
+					{category ? categoryName : t('catalog-all-title')}
 				</motion.h1>
 				<motion.ul
 					initial={{ translateY: '15px', opacity: 0 }}
@@ -41,14 +46,16 @@ export default async function CatalogPage({
 					className='flex items-center gap-x-12 gap-y-6 mt-6 uppercase text-sm tracking-wide max-sm:text-center max-sm:grid max-sm:grid-cols-2 max-sm:gap-x-6 max-sm:gap-y-4 max-[400px]:!grid-cols-1'
 				>
 					<li className='hover:underline underline-offset-4'>
-						<Link href='/catalog'>Всі</Link>
+						<Link href='/catalog'>{t('catalog-all-categories')}</Link>
 					</li>
 					{categories?.map(category => (
 						<li
 							className='hover:underline underline-offset-4'
 							key={category.id}
 						>
-							<Link href={`/catalog?category=${category.slug}`}>{(category.name as any).ua}</Link>
+							<Link href={`/catalog?category=${category.slug}`}>
+								{(category.name as any)[locale]}
+							</Link>
 						</li>
 					))}
 				</motion.ul>

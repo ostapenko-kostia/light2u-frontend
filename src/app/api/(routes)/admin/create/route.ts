@@ -1,10 +1,10 @@
+import { ApiError } from '@/app/api/exceptions/apiError'
 import { handleApiError } from '@/app/api/exceptions/handleApiError'
 import { prisma } from '@/prisma/prisma-client'
-import { NextRequest, NextResponse } from 'next/server'
-import Joi from 'joi'
-import { ApiError } from '@/app/api/exceptions/apiError'
-import { checkIsAdmin } from '../../admin/auth/utils/checkIsAdmin'
 import bcrypt from 'bcrypt'
+import Joi from 'joi'
+import { NextRequest, NextResponse } from 'next/server'
+import { checkIsAdmin } from '../auth/utils/checkIsAdmin'
 
 const adminSchema = Joi.object({
 	email: Joi.string().email().min(1).required().messages({

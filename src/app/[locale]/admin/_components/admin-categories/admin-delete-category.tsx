@@ -53,7 +53,7 @@ export function AdminDeleteCategory({ category, products }: Props) {
 			}
 		>
 			<div className='flex flex-col items-start gap-6'>
-				<p>Ви дійсно хочете видалити категорію {(category.name as any).ua}?</p>
+				<p>Ви дійсно хочете видалити категорію {(category.name as any).uk}?</p>
 				<button
 					className='bg-gray-800 text-white rounded-md px-6 py-2 hover:bg-gray-700'
 					onClick={() => deleteFunc(category.id)}

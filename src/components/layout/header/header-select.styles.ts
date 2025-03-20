@@ -1,5 +1,10 @@
 import { StylesConfig } from 'react-select'
 
+export type OptionType = {
+	value: string
+	label: string
+}
+
 const MONOCHROME = {
 	black: '#000000',
 	white: '#FFFFFF',
@@ -7,7 +12,7 @@ const MONOCHROME = {
 	darkGray: '#E5E5E5'
 }
 
-export const customStyles: StylesConfig = {
+export const customStyles: StylesConfig<OptionType> = {
 	control: provided => ({
 		...provided,
 		border: 'none',

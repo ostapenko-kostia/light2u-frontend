@@ -1,8 +1,8 @@
+import { ApiError } from '@/app/api/exceptions/apiError'
+import { handleApiError } from '@/app/api/exceptions/handleApiError'
+import { getFiles } from '@/app/api/utils/getFiles'
 import { NextRequest, NextResponse } from 'next/server'
 import { checkIsAdmin } from '../../admin/auth/utils/checkIsAdmin'
-import { handleApiError } from '@/app/api/exceptions/handleApiError'
-import { ApiError } from '@/app/api/exceptions/apiError'
-import { getFiles } from '@/app/api/utils/getFiles'
 
 export async function GET(req: NextRequest) {
 	try {

@@ -6,7 +6,7 @@ import { HeaderLinks } from './header-links'
 import { Dialog } from '@/components/ui/dialog'
 import { HeaderLangSwitcher } from './header-lang-switcher'
 
-export function Header() {
+export async function Header() {
 	return (
 		<header className='py-3 bg-white grow-0 shrink-0 border-b border-gray-100'>
 			<Container className='flex items-center justify-between'>

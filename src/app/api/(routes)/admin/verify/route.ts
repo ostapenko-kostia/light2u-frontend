@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
 import { ApiError } from '@/app/api/exceptions/apiError'
 import { handleApiError } from '@/app/api/exceptions/handleApiError'
+import jwt from 'jsonwebtoken'
+import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
 	try {

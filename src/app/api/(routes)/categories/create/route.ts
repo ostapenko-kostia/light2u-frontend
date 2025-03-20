@@ -1,20 +1,20 @@
 import { ApiError } from '@/app/api/exceptions/apiError'
 import { handleApiError } from '@/app/api/exceptions/handleApiError'
+import { saveFile } from '@/app/api/utils/saveFile'
 import { prisma } from '@/prisma/prisma-client'
 import slugify from '@sindresorhus/slugify'
 import Joi from 'joi'
 import { NextRequest, NextResponse } from 'next/server'
 import { checkIsAdmin } from '../../admin/auth/utils/checkIsAdmin'
-import { saveFile } from '@/app/api/utils/saveFile'
 
 const catSchema = Joi.object({
 	ru: Joi.string().min(1).required().messages({
 		'string.empty': 'Russian name is required',
 		'any.required': 'Russian name is required'
 	}),
-	ua: Joi.string().min(1).required().messages({
-		'string.empty': 'Ukrainian name is required',
-		'any.required': 'Ukrainian name is required'
+	uk: Joi.string().min(1).required().messages({
+		'string.empty': "Назва категорії українською обов'язкова до заповнення",
+		'string.min': 'Назва категорії українською повинна містити принаймні 1 символ'
 	})
 })
 
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 			throw new ApiError(`Validation error: ${errorDetails}`, 400)
 		}
 
-		value.slug = slugify(name.ua)
+		value.slug = slugify(name.uk)
 		const existingCategory = await prisma.category.findUnique({ where: { slug: value.slug } })
 
 		if (existingCategory) {

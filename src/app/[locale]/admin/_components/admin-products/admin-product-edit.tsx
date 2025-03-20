@@ -126,7 +126,7 @@ export function AdminProductEdit({ categories, product }: Props) {
 								key={category.id}
 								value={category.slug}
 							>
-								{(category.name as any).ua}
+								{(category.name as any).uk}
 							</option>
 						))}
 					</select>

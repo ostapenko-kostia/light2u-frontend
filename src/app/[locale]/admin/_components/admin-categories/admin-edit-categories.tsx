@@ -85,7 +85,7 @@ export function AdminEditCategory({ category }: Props) {
 						type='text'
 						placeholder='Категорія'
 						id='cat'
-						defaultValue={(category.name as any).ua}
+						defaultValue={(category.name as any).uk}
 						{...register('nameUa')}
 					/>
 				</div>

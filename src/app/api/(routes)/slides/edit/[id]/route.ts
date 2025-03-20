@@ -1,11 +1,11 @@
-import { handleApiError } from '@/app/api/exceptions/handleApiError'
-import { prisma } from '@/prisma/prisma-client'
-import { NextRequest, NextResponse } from 'next/server'
-import Joi from 'joi'
 import { ApiError } from '@/app/api/exceptions/apiError'
-import { checkIsAdmin } from '../../../admin/auth/utils/checkIsAdmin'
-import { saveFile } from '@/app/api/utils/saveFile'
+import { handleApiError } from '@/app/api/exceptions/handleApiError'
 import { deleteFile } from '@/app/api/utils/deleteFile'
+import { saveFile } from '@/app/api/utils/saveFile'
+import { prisma } from '@/prisma/prisma-client'
+import Joi from 'joi'
+import { NextRequest, NextResponse } from 'next/server'
+import { checkIsAdmin } from '../../../admin/auth/utils/checkIsAdmin'
 
 const slideSchema = Joi.object({
 	text: Joi.string(),

@@ -23,3 +23,14 @@ export function useGetTexts() {
 		refetchOnWindowFocus: false
 	})
 }
+
+export function useGetTextsByLocale(locale: string = 'uk') {
+	return useQuery({
+		queryKey: ['texts', locale],
+		queryFn: async () => {
+			const res = await textsService.getTextsByLocale(locale)
+			return res
+		},
+		refetchOnWindowFocus: false
+	})
+}

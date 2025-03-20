@@ -1,9 +1,9 @@
+import { ApiError } from '@/app/api/exceptions/apiError'
 import { handleApiError } from '@/app/api/exceptions/handleApiError'
+import { api } from '@/lib/axios'
+import { prisma } from '@/prisma/prisma-client'
 import { NextRequest, NextResponse } from 'next/server'
 import { checkIsAdmin } from '../../../admin/auth/utils/checkIsAdmin'
-import { ApiError } from '@/app/api/exceptions/apiError'
-import { prisma } from '@/prisma/prisma-client'
-import { api } from '@/lib/axios'
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {

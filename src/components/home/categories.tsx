@@ -1,10 +1,18 @@
+import { getServerTranslation } from '@/lib/server-translation'
+import { Category } from '@prisma/client'
 import * as motion from 'framer-motion/client'
-import { Container } from '../layout/container'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Category } from '@prisma/client'
+import { Container } from '../layout/container'
 
-export async function HomeCategories({ categories }: { categories: Category[] | undefined }) {
+export async function HomeCategories({
+	categories,
+	locale
+}: {
+	categories: Category[] | undefined
+	locale: string
+}) {
+	const { t } = await getServerTranslation(locale)
 	return (
 		<motion.div
 			className='py-12'
@@ -13,7 +21,7 @@ export async function HomeCategories({ categories }: { categories: Category[] | 
 			transition={{ duration: 0.7, ease: 'anticipate' }}
 		>
 			<Container>
-				<h2 className='text-xl uppercase tracking-wide'>Категорії</h2>
+				<h2 className='text-xl uppercase tracking-wide'>{t('home-categories-title')}</h2>
 				<section className='grid grid-cols-4 gap-8 w-full pt-6 max-xl:grid-cols-3 max-md:grid-cols-2 max-[350px]:!grid-cols-1'>
 					{categories?.map(category => (
 						<article
@@ -27,13 +35,13 @@ export async function HomeCategories({ categories }: { categories: Category[] | 
 								<div className='relative w-full h-full rounded-sm aspect-square overflow-hidden'>
 									<Image
 										src={category.image}
-										alt={(category.name as any).ua}
+										alt={(category.name as any)[locale]}
 										fill
 										sizes='100%, 100%'
 										className='object-cover aspect-square rounded-sm group-hover:scale-110 group-hover:brightness-90 transition-all duration-1000'
 									/>
 								</div>
-								<h3 className='text-lg'>{(category.name as any).ua}</h3>
+								<h3 className='text-lg'>{(category.name as any)[locale]}</h3>
 							</Link>
 						</article>
 					))}

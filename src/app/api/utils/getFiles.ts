@@ -2,7 +2,7 @@ import { TOKEN } from '@/typing/enums'
 import { NextRequest } from 'next/server'
 import { ApiError } from '../exceptions/apiError'
 import axios from 'axios'
-import { IFile } from '@/app/admin/_components/admin-storage/admin-storage.typing'
+import { IFile } from '@/app/[locale]/admin/_components/admin-storage/admin-storage.typing'
 
 export async function getFiles(req: NextRequest): Promise<IFile[]> {
 	try {

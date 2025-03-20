@@ -1,21 +1,21 @@
-import { handleApiError } from '@/app/api/exceptions/handleApiError'
-import { prisma } from '@/prisma/prisma-client'
-import { NextRequest, NextResponse } from 'next/server'
-import Joi from 'joi'
 import { ApiError } from '@/app/api/exceptions/apiError'
-import slugify from '@sindresorhus/slugify'
-import { checkIsAdmin } from '../../../admin/auth/utils/checkIsAdmin'
-import { saveFile } from '@/app/api/utils/saveFile'
+import { handleApiError } from '@/app/api/exceptions/handleApiError'
 import { deleteFile } from '@/app/api/utils/deleteFile'
+import { saveFile } from '@/app/api/utils/saveFile'
+import { prisma } from '@/prisma/prisma-client'
+import slugify from '@sindresorhus/slugify'
+import Joi from 'joi'
+import { NextRequest, NextResponse } from 'next/server'
+import { checkIsAdmin } from '../../../admin/auth/utils/checkIsAdmin'
 
 const catSchema = Joi.object({
 	ru: Joi.string().min(1).required().messages({
 		'string.empty': 'Russian name is required',
 		'any.required': 'Russian name is required'
 	}),
-	ua: Joi.string().min(1).required().messages({
-		'string.empty': 'Ukrainian name is required',
-		'any.required': 'Ukrainian name is required'
+	uk: Joi.string().min(1).required().messages({
+		'string.empty': "Назва категорії українською обов'язкова до заповнення",
+		'string.min': 'Назва категорії українською повинна містити принаймні 1 символ'
 	})
 })
 
@@ -35,7 +35,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 			throw new ApiError(`Validation error: ${errorDetails}`, 400)
 		}
 
-		value.slug = slugify(name.ua)
+		value.slug = slugify(name.uk)
 
 		const isAdmin = await checkIsAdmin(req)
 

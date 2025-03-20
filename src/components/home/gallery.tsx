@@ -10,9 +10,11 @@ import 'swiper/css/pagination'
 import { useRef } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Gallery } from '@prisma/client'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export function HomeGallery({ galleries }: { galleries: Gallery[] | undefined }) {
 	const swiperRef = useRef<SwiperRef>(null)
+	const { t } = useTranslation()
 	return (
 		<motion.div
 			className='py-12'
@@ -21,7 +23,7 @@ export function HomeGallery({ galleries }: { galleries: Gallery[] | undefined })
 			transition={{ duration: 0.7, ease: 'anticipate' }}
 		>
 			<Container>
-				<h2 className='text-xl uppercase tracking-wide'>Галерея</h2>
+				<h2 className='text-xl uppercase tracking-wide'>{t('home-gallery-title')}</h2>
 				<div className='flex items-center gap-4 w-full mt-6'>
 					<button
 						onClick={() => swiperRef.current?.swiper.slidePrev()}

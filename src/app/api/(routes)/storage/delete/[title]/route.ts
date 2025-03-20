@@ -1,8 +1,8 @@
+import { ApiError } from '@/app/api/exceptions/apiError'
+import { handleApiError } from '@/app/api/exceptions/handleApiError'
+import { deleteFile } from '@/app/api/utils/deleteFile'
 import { NextRequest, NextResponse } from 'next/server'
 import { checkIsAdmin } from '../../../admin/auth/utils/checkIsAdmin'
-import { handleApiError } from '@/app/api/exceptions/handleApiError'
-import { ApiError } from '@/app/api/exceptions/apiError'
-import { deleteFile } from '@/app/api/utils/deleteFile'
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ title: string }> }) {
 	try {

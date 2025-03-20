@@ -58,12 +58,14 @@ model Admin {
 model TextField {
   id Int @id @unique @default(autoincrement())
 
-  slug   String @unique
+  slug   String
   locale String @default("uk")
   text   String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([slug, locale])
 }
 
 model FailedLoginAttempt {

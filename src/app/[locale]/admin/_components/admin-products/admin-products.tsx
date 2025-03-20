@@ -1,10 +1,10 @@
 'use client'
 
+import { ProductCard } from '@/components/layout/product-card'
 import type { Category, Product } from '@prisma/client'
 import { AdminProductCreate } from './admin-product-create'
 import { AdminProductDelete } from './admin-product-delete'
 import { AdminProductEdit } from './admin-product-edit'
-import { ProductCard } from '@/components/layout/product-card'
 import { AdminProductInfo } from './admin-product-info'
 
 interface Props {
@@ -22,7 +22,7 @@ export function AdminProductsTab({ products, categories }: Props) {
 						{products.map(product => {
 							const categoryName =
 								(categories?.find(category => category.slug === product.categorySlug)?.name as any)
-									?.ua ?? 'Без категорії'
+									?.uk ?? 'Без категорії'
 							return (
 								<div
 									className='relative max-[500px]:pr-0'

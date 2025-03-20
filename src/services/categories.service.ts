@@ -1,5 +1,5 @@
-import { Category } from '@prisma/client'
 import { api } from '@/lib/axios'
+import { Category } from '@prisma/client'
 
 class CategoriesService {
 	async getAllCategories() {
@@ -10,7 +10,7 @@ class CategoriesService {
 		} catch {}
 	}
 
-	async createCategory({ name, image }: { name: { ua: string; ru: string }; image: FileList }) {
+	async createCategory({ name, image }: { name: { uk: string; ru: string }; image: FileList }) {
 		const formData = new FormData()
 		formData.append('name', JSON.stringify(name))
 		formData.append('image', image[0])
@@ -31,7 +31,7 @@ class CategoriesService {
 		image?: FileList
 	}) {
 		const formData = new FormData()
-		formData.append('name', JSON.stringify({ ua: nameUa, ru: nameRu }))
+		formData.append('name', JSON.stringify({ uk: nameUa, ru: nameRu }))
 		if (image) formData.append('image', image[0])
 		return await api.put(`/categories/edit/${id}`, formData, {
 			headers: { 'Content-Type': 'multipart/form-data' }

@@ -1,6 +1,7 @@
 'use client'
 
 import { DialogContext } from '@/components/ui/dialog'
+import { useTranslation } from '@/hooks/useTranslation'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -9,6 +10,9 @@ import { useContext } from 'react'
 
 export function HeaderLinks({ className }: { className?: string }) {
 	const pathname = usePathname()
+
+	const { t } = useTranslation()
+
 	const dialogValues = useContext(DialogContext)
 	const closeDialog = dialogValues?.closeDialog
 
@@ -23,7 +27,7 @@ export function HeaderLinks({ className }: { className?: string }) {
 					onClick={() => closeDialog?.()}
 					href='/'
 				>
-					Головна
+					{t('header-home-link')}
 				</Link>
 			</li>
 			<li
@@ -35,7 +39,7 @@ export function HeaderLinks({ className }: { className?: string }) {
 					onClick={() => closeDialog?.()}
 					href='/catalog'
 				>
-					Каталог
+					{t('header-catalog-link')}
 				</Link>
 			</li>
 			<li
@@ -47,7 +51,7 @@ export function HeaderLinks({ className }: { className?: string }) {
 					onClick={() => closeDialog?.()}
 					href='/about'
 				>
-					Про Нас
+					{t('header-about-link')}
 				</Link>
 			</li>
 			<li
@@ -59,7 +63,7 @@ export function HeaderLinks({ className }: { className?: string }) {
 					onClick={() => closeDialog?.()}
 					href='/contacts'
 				>
-					Контакти
+					{t('header-contacts-link')}
 				</Link>
 			</li>
 		</ul>

@@ -22,6 +22,7 @@ export async function saveFile(file: File, req: NextRequest): Promise<string> {
 			(re.exec(file.name)?.length ? '.' + re.exec(file.name)?.[1] : '')
 		)
 	} catch (error) {
+		console.log('error', error)
 		throw new ApiError(`Error: ${error}`, 500)
 	}
 }

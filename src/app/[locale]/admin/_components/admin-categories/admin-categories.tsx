@@ -62,7 +62,7 @@ export function AdminCategoriesTab({ categories, products }: Props) {
 							<tr key={category.id}>
 								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>{category.id}</td>
 								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-									{(category.name as any).ua}
+									{(category.name as any).uk}
 								</td>
 								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
 									{category.slug}
@@ -75,7 +75,10 @@ export function AdminCategoriesTab({ categories, products }: Props) {
 								</td>
 								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
 									<AdminEditCategory category={category} />
-									<AdminDeleteCategory category={category} products={products} />
+									<AdminDeleteCategory
+										category={category}
+										products={products}
+									/>
 								</td>
 							</tr>
 						))}

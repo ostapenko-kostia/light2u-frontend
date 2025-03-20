@@ -27,7 +27,7 @@ export function useCreateCategory() {
 		}) => {
 			const name = {
 				ru: nameRu,
-				ua: nameUa
+				uk: nameUa
 			}
 			const res = await categoriesService.createCategory({ image, name })
 			if (!res?.data) return Promise.reject()
