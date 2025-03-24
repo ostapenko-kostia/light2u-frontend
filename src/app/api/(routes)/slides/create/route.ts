@@ -18,6 +18,10 @@ const slideSchema = Joi.object({
 	description: Joi.string().min(1).required().messages({
 		'string.empty': 'Description is required',
 		'any.required': 'Description is required'
+	}),
+	locale: Joi.string().valid('uk', 'ru').default('uk').messages({
+		'string.empty': 'Locale is required',
+		'any.only': 'Locale must be either "uk" or "ru"'
 	})
 })
 

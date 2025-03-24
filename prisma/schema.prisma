@@ -25,6 +25,8 @@ model Product {
   bulbColor  String
   bulbType   String
 
+  locale String @default("uk")
+
   category     Category @relation(fields: [categorySlug], references: [slug])
   categorySlug String
 
@@ -86,6 +88,7 @@ model Slide {
   description String
   text        String
   url         String
+  locale      String @default("uk")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

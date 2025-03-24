@@ -1,25 +1,35 @@
 import { Container } from '@/components/layout/container'
+import { ProductCard } from '@/components/layout/product-card'
+import { getServerTranslation } from '@/lib/server-translation'
+import { productsService } from '@/services/products.service'
+import * as motion from 'framer-motion/client'
 import Image from 'next/image'
 import { Product } from './Product'
-import { ProductCard } from '@/components/layout/product-card'
-import * as motion from 'framer-motion/client'
-import { productsService } from '@/services/products.service'
-import { getServerTranslation } from '@/lib/server-translation'
+import { notFound } from 'next/navigation'
 
-export default async function ProductPage({ params }: { params: Promise<{ slug: string, locale: string }> }) {
+export default async function ProductPage({
+	params
+}: {
+	params: Promise<{ slug: string; locale: string }>
+}) {
 	const { slug, locale } = await params
 	const { t } = await getServerTranslation(locale)
 
 	const products = (await productsService.getAllProducts())?.data
-	const product = products?.find(p => p.slug === slug)
 
-	const sameProducts = products
+	const product = products?.find(p => {
+		return p.slug === slug && (p.locale === locale || (!p.locale && locale === 'uk'))
+	})
+
+	const localeProducts = products?.filter(
+		p => p.locale === locale || (!p.locale && locale === 'uk')
+	)
+
+	const sameProducts = localeProducts
 		?.filter(p => p.categorySlug === product?.categorySlug)
 		.filter(i => i.id !== product?.id)
 
-	if (!product) {
-		return <div>Product not found</div>
-	}
+	if (!product) notFound()
 
 	return (
 		<motion.section

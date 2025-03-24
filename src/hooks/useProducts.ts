@@ -1,26 +1,6 @@
 import { productsService } from '@/services/products.service'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
-interface Product {
-	id: number
-	slug: string
-	name: string
-	images: string[]
-	description: string
-	price: number
-	materials: string
-	dimensions: string
-	weight: string
-	power: string
-	voltage: number
-	bulb: string
-	bulbColor: string
-	bulbType: string
-	categorySlug: string
-	createdAt: Date
-	updatedAt: Date
-}
-
 export const useGetProducts = () => {
 	return useQuery({
 		queryKey: ['products get'],
@@ -59,6 +39,7 @@ export const useCreateProduct = () => {
 		bulb: string
 		bulbColor: string
 		bulbType: string
+		locale: string
 	}
 
 	return useMutation({
@@ -69,11 +50,7 @@ export const useCreateProduct = () => {
 			Array.from(data.images).forEach(el => {
 				formData.append('images', el)
 			})
-			const dataWithoutImages = Object.entries(data).reduce((acc, [key, value]) => {
-				if (key !== 'images') acc[key] = value
-				return acc
-			}, {} as Record<string, string>)
-
+			const { images, ...dataWithoutImages } = data
 			formData.append('productInfo', JSON.stringify(dataWithoutImages))
 
 			const res = await productsService.createProduct(formData)
@@ -98,6 +75,7 @@ export const useUpdateProduct = () => {
 		bulb?: string
 		bulbColor?: string
 		bulbType?: string
+		locale?: string
 	}
 
 	return useMutation({

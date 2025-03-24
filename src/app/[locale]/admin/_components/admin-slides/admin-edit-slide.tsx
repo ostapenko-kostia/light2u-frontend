@@ -16,6 +16,7 @@ interface Form {
 	text?: string
 	url?: string
 	description?: string
+	locale?: string
 }
 
 interface Props {
@@ -30,7 +31,8 @@ export function AdminSlideEdit({ slide }: Props) {
 			background: undefined,
 			text: slide.text,
 			url: slide.url,
-			description: slide.description
+			description: slide.description,
+			locale: slide.locale
 		}
 	})
 	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useUpdateSlide()

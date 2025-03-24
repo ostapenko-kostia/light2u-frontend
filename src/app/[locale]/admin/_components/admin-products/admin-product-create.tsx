@@ -28,19 +28,25 @@ interface Form {
 	bulb: string
 	bulbColor: string
 	bulbType: string
+	locale: string
 }
 
 interface Props {
 	categories: Category[] | undefined
+	locale: 'uk' | 'ru'
 }
 
-export function AdminProductCreate({ categories }: Props) {
+export function AdminProductCreate({ categories, locale }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
 	const { register, handleSubmit, setValue, watch } = useForm<Form>()
 	const queryClient = useQueryClient()
 	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useCreateProduct()
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
+
+	useEffect(() => {
+		setValue('locale', locale)
+	}, [locale, setValue])
 
 	useEffect(() => {
 		if (isPending) {

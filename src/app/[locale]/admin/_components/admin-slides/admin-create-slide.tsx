@@ -15,13 +15,22 @@ interface Form {
 	text: string
 	url: string
 	description: string
+	locale: string
 }
 
-export function AdminSlideCreate() {
+interface Props {
+	locale: 'uk' | 'ru'
+}
+
+export function AdminSlideCreate({ locale }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
 	const queryClient = useQueryClient()
 	const { register, handleSubmit, setValue } = useForm<Form>()
 	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useCreateSlide()
+
+	useEffect(() => {
+		setValue('locale', locale)
+	}, [locale, setValue])
 
 	useEffect(() => {
 		if (isPending) {

@@ -20,14 +20,19 @@ const productSchema = Joi.object({
 	voltage: Joi.number().integer().positive().optional(),
 	bulb: Joi.string().optional(),
 	bulbColor: Joi.string().optional(),
-	bulbType: Joi.string().optional()
+	bulbType: Joi.string().optional(),
+	locale: Joi.string().valid('uk', 'ru').default('uk').messages({
+		'string.empty': 'Locale is required',
+		'any.only': 'Locale must be either "uk" or "ru"'
+	})
 })
 
-async function generateUniqueSlug(slug: string): Promise<string> {
-	let uniqueSlug = slug
+async function generateUniqueSlug(slug: string, locale: string): Promise<string> {
+	const slugWithLocale = `${slug}-${locale}`
+	let uniqueSlug = slugWithLocale
 	let counter = 1
 	while (await prisma.product.findUnique({ where: { slug: uniqueSlug } })) {
-		uniqueSlug = `${slug}-${counter}`
+		uniqueSlug = `${slugWithLocale}-${counter}`
 		counter++
 	}
 	return uniqueSlug
@@ -56,7 +61,7 @@ export async function PUT(
 
 		if (value.name) {
 			value.slug = slugify(value.name)
-			value.slug = await generateUniqueSlug(value.slug)
+			value.slug = await generateUniqueSlug(value.slug, value.locale)
 		}
 
 		if (newImages.length) {

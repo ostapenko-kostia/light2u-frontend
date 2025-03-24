@@ -23,6 +23,7 @@ interface Form {
 	bulb?: string
 	bulbColor?: string
 	bulbType?: string
+	locale?: string
 }
 
 interface Props {
@@ -33,12 +34,13 @@ interface Props {
 export function AdminProductEdit({ categories, product }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
 	const queryClient = useQueryClient()
-	const { register, handleSubmit, setValue, watch } = useForm<Form>()
+	const { register, handleSubmit, setValue } = useForm<Form>()
 	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useUpdateProduct()
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
 
 	const edit = async (data: Form) => {
+		data.locale = product.locale
 		await editFunc({
 			id: product.id,
 			data

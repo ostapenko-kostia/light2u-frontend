@@ -1,6 +1,11 @@
-import * as motion from 'framer-motion/client'
+'use client'
+
+import { useTranslation } from '@/hooks/useTranslation'
+import { motion } from 'framer-motion'
 
 export default function NotFoundPage() {
+	const { t } = useTranslation()
+
 	return (
 		<motion.div
 			initial={{ translateY: '15px', opacity: 0 }}
@@ -9,7 +14,7 @@ export default function NotFoundPage() {
 			className='relative top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
 		>
 			<h1 className='text-center text-4xl font-bold'>404</h1>
-			<p className='text-center'>Сторінка не знайдена</p>
+			<p className='text-center'>{t('not-found-text')}</p>
 		</motion.div>
 	)
 }

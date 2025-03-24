@@ -59,15 +59,21 @@ const productSchema = Joi.object({
 	bulbType: Joi.string().required().messages({
 		'string.empty': 'Bulb type is required',
 		'any.required': 'Bulb type is required'
+	}),
+	locale: Joi.string().valid('uk', 'ru').default('uk').messages({
+		'string.empty': 'Locale is required',
+		'any.only': 'Locale must be either "uk" or "ru"'
 	})
 })
 
-async function generateUniqueSlug(slug: string): Promise<string> {
-	let uniqueSlug = slug
+async function generateUniqueSlug(slug: string, locale: string = 'uk'): Promise<string> {
+	// Add locale to the slug to ensure it's unique across locales
+	const slugWithLocale = `${slug}-${locale}`
+	let uniqueSlug = slugWithLocale
 	let counter = 1
 
 	while (await prisma.product.findUnique({ where: { slug: uniqueSlug } })) {
-		uniqueSlug = `${slug}-${counter}`
+		uniqueSlug = `${slugWithLocale}-${counter}`
 		counter++
 	}
 
@@ -91,7 +97,7 @@ export async function POST(req: NextRequest) {
 
 		value.slug = slugify(value.name)
 
-		value.slug = await generateUniqueSlug(value.slug)
+		value.slug = await generateUniqueSlug(value.slug, value.locale)
 
 		const isAdmin = await checkIsAdmin(req)
 		if (!isAdmin) throw new ApiError('You are not admin', 403)
@@ -122,6 +128,7 @@ export async function POST(req: NextRequest) {
 				bulb: value.bulb,
 				bulbColor: value.bulbColor,
 				bulbType: value.bulbType,
+				locale: value.locale || 'uk',
 				images: savedImages
 			}
 		})

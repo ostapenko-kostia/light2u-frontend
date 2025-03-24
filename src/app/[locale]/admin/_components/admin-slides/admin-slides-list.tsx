@@ -1,14 +1,15 @@
 import { Slide } from '@prisma/client'
-import { AdminSlideEdit } from './admin-edit-slide'
-import { AdminDeleteSlide } from './admin-delete-slide'
 import Image from 'next/image'
 import { AdminSlideCreate } from './admin-create-slide'
+import { AdminDeleteSlide } from './admin-delete-slide'
+import { AdminSlideEdit } from './admin-edit-slide'
 
 interface Props {
 	slides: Slide[] | undefined
+	locale: 'uk' | 'ru'
 }
 
-export function AdminSlidesList({ slides }: Props) {
+export function AdminSlidesList({ slides, locale }: Props) {
 	return (
 		<div className='grid grid-cols-3 mt-5 w-full gap-10 max-xl:grid-cols-3 max-md:grid-cols-2 max-[480px]:grid-cols-1'>
 			{slides?.map(slide => (
@@ -40,7 +41,7 @@ export function AdminSlidesList({ slides }: Props) {
 					</div>
 				</div>
 			))}
-			<AdminSlideCreate />
+			<AdminSlideCreate locale={locale} />
 		</div>
 	)
 }

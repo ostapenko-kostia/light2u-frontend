@@ -30,6 +30,7 @@ export function useCreateSlide() {
 		text: string
 		url: string
 		description: string
+		locale: string
 	}
 	return useMutation({
 		mutationKey: ['slide create'],
@@ -59,6 +60,7 @@ export function useUpdateSlide() {
 		text?: string
 		url?: string
 		description?: string
+		locale?: string
 	}
 	return useMutation({
 		mutationKey: ['slide update'],

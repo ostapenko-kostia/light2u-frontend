@@ -10,7 +10,7 @@ import { checkIsAdmin } from '../../../admin/auth/utils/checkIsAdmin'
 const slideSchema = Joi.object({
 	text: Joi.string(),
 	url: Joi.string(),
-	description: Joi.string()
+	description: Joi.string(),
 })
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

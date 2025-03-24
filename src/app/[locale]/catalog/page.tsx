@@ -19,9 +19,15 @@ export default async function CatalogPage({
 	const { t } = await getServerTranslation(locale)
 
 	const products = (await productsService.getAllProducts())?.data
+
+	// Filter products by locale first, then by category if selected
+	const localeProducts = products?.filter(
+		product => product.locale === locale || (!product.locale && locale === 'uk')
+	)
 	const filteredProducts = category?.length
-		? products?.filter(i => i.categorySlug === category)
-		: products
+		? localeProducts?.filter(i => i.categorySlug === category)
+		: localeProducts
+
 	const categories = (await categoriesService.getAllCategories())?.data
 
 	const categoryName = category

@@ -13,10 +13,18 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 	const slides = (await slideService.getAllSlides())?.data
 	const galleries = (await galleryService.getAll())?.data
 
+	// Фільтрація слайдів за поточною локаллю
+	const localizedSlides = slides?.filter(
+		slide => slide.locale === locale || (!slide.locale && locale === 'uk')
+	)
+
 	return (
 		<section>
-			<Hero slides={slides} />
-			<HomeCategories categories={categories} locale={locale} />
+			<Hero slides={localizedSlides} />
+			<HomeCategories
+				categories={categories}
+				locale={locale}
+			/>
 			<HomeGallery galleries={galleries} />
 		</section>
 	)
