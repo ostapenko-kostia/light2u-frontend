@@ -5,10 +5,11 @@ import Link from 'next/link'
 interface ProductCardProps {
 	product: Product
 }
+
 export function ProductCard({ product }: ProductCardProps) {
 	return (
 		<Link
-			href={`/product/${product.slug}`}
+			href={`/${product.locale}/product/${product.slug}`}
 			className='contents'
 		>
 			<article className='flex flex-col gap-4 w-full group'>

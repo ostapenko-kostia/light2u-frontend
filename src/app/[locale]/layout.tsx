@@ -50,7 +50,7 @@ export default async function RootLayout({
 					messages={messages}
 				>
 					<Toaster containerStyle={{ zIndex: 10000 }} />
-					<Header />
+					<Header locale={locale} />
 					<main className='grow'>{children}</main>
 					<Footer />
 				</Provider>

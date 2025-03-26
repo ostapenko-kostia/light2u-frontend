@@ -11,7 +11,7 @@ export function Product({ product }: { product: ProductType }) {
 		<>
 			<div>
 				<h1 className='text-4xl max-[500px]:!text-2xl'>{product.name}</h1>
-				<p className='text-2xl font-light'>₴{product.price} грн</p>
+				<p className='text-2xl font-light mt-4'>₴{product.price} грн</p>
 			</div>
 
 			<p className='text-md mt-2 font-light'>{product.description}</p>
