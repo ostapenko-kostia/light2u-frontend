@@ -21,11 +21,11 @@ export async function Header({ locale }: { locale: string }) {
 						</button>
 					}
 				>
-					<HeaderLinks className='flex flex-col gap-8' />
+					<HeaderLinks className='flex flex-col gap-8' locale={locale} />
 					<HeaderButtons locale={locale} className='flex gap-2 mt-6 justify-center items-center' />
 				</Dialog>
-				<Logo className='max-md:mr-auto max-md:ml-5' />
-				<HeaderLinks className='max-md:hidden' />
+				<Logo locale={locale} className='max-md:mr-auto max-md:ml-5' />
+				<HeaderLinks className='max-md:hidden' locale={locale} />
 				<div className='flex items-center gap-2'>
 					<HeaderButtons locale={locale} className='max-md:hidden' />
 					<HeaderLangSwitcher />

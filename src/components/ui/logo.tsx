@@ -1,8 +1,8 @@
 import Link from 'next/link'
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, locale }: { className?: string, locale: string }) {
 	return (
-		<Link href='/'>
+		<Link href={`/${locale}`}>
 			<svg
 				className={className}
 				version='1.0'

@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation'
 import { match } from 'path-to-regexp'
 import { useContext } from 'react'
 
-export function HeaderLinks({ className }: { className?: string }) {
+export function HeaderLinks({ className, locale }: { className?: string, locale: string }) {
 	const pathname = usePathname()
 
 	const { t } = useTranslation()
@@ -25,7 +25,7 @@ export function HeaderLinks({ className }: { className?: string }) {
 			>
 				<Link
 					onClick={() => closeDialog?.()}
-					href='/'
+					href={`/${locale}`}
 				>
 					{t('header-home-link')}
 				</Link>
@@ -37,7 +37,7 @@ export function HeaderLinks({ className }: { className?: string }) {
 			>
 				<Link
 					onClick={() => closeDialog?.()}
-					href='/catalog'
+					href={`/${locale}/catalog`}
 				>
 					{t('header-catalog-link')}
 				</Link>
@@ -49,7 +49,7 @@ export function HeaderLinks({ className }: { className?: string }) {
 			>
 				<Link
 					onClick={() => closeDialog?.()}
-					href='/about'
+					href={`/${locale}/about`}
 				>
 					{t('header-about-link')}
 				</Link>
@@ -61,7 +61,7 @@ export function HeaderLinks({ className }: { className?: string }) {
 			>
 				<Link
 					onClick={() => closeDialog?.()}
-					href='/contacts'
+					href={`/${locale}/contacts`}
 				>
 					{t('header-contacts-link')}
 				</Link>
