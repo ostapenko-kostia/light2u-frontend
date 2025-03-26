@@ -28,7 +28,7 @@ export function Hero({ slides }: { slides: Slide[] | undefined }) {
 						key={index}
 						className='w-full h-full pt-20 pb-10 max-sm:py-12 text-center relative'
 					>
-						<div className='absolute w-full h-full inset-0 top-0 left-0 -z-10'>
+						<div className='absolute w-1/2 h-full inset-0 top-0 left-1/2 -z-10'>
 							<div className='relative w-full h-full inset-0 top-0 left-0'>
 								<Image
 									src={slide.background}
@@ -37,7 +37,7 @@ export function Hero({ slides }: { slides: Slide[] | undefined }) {
 									sizes='100%, 100%'
 									priority={index === 0}
 									loading={index === 0 ? 'eager' : 'lazy'}
-									className='object-cover object-[50%_50%]'
+									className='object-cover object-[100%_20%]'
 								/>
 							</div>
 						</div>

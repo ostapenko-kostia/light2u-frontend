@@ -32,11 +32,11 @@ export function HeaderLangSwitcher({ className }: { className?: string }) {
 			<Select<OptionType>
 				instanceId='lang-switcher'
 				className={className}
-				value={{ value: locale, label: locale.toUpperCase() }}
+				value={{ value: locale, label: locale === "uk" ? "UA" : locale.toUpperCase() }}
 				onChange={option => option && switchLanguage(option.value)}
 				styles={customStyles}
 				isSearchable={false}
-				options={locales.map(loc => ({ value: loc, label: loc.toUpperCase() }))}
+				options={locales.map(loc => ({ value: loc, label: loc === "uk" ? "UA" : loc.toUpperCase() }))}
 			/>
 		</div>
 	)
