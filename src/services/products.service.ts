@@ -1,10 +1,14 @@
 import { api } from '@/lib/axios'
-import type { Product } from '@prisma/client'
+import type { Product, ProductInfo } from '@prisma/client'
+
+type ProductWithInfo = Product & {
+	info: ProductInfo[]
+}
 
 class ProductsService {
 	async getAllProducts() {
 		try {
-			const res = await api.get<Product[]>('/products/all')
+			const res = await api.get<ProductWithInfo[]>('/products/all')
 			if (res.status != 200) throw new Error('Помилка при отриманні товарів')
 			return res
 		} catch {}

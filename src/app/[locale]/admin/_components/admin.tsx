@@ -1,7 +1,7 @@
 'use client'
 
 import { useGetAdmins } from '@/hooks/useAdmin'
-import { useGetCategories } from '@/hooks/useCategories'
+import { useGetFirstLevelCategories, useGetSecondLevelCategories } from '@/hooks/useCategories'
 import { useGetGallery } from '@/hooks/useGallery'
 import { useGetProducts } from '@/hooks/useProducts'
 import { useGetSlides } from '@/hooks/useSlides'
@@ -19,7 +19,8 @@ import { AdminsTab } from './admins-tab/admins-tab'
 
 function AdminComponent() {
 	const { data: products } = useGetProducts()
-	const { data: categories } = useGetCategories()
+	const { data: firstLevelCategories } = useGetFirstLevelCategories()
+	const { data: secondLevelCategories } = useGetSecondLevelCategories()
 	const { data: texts } = useGetTexts()
 	const { data: admins } = useGetAdmins()
 	const { data: files } = useGetFiles()
@@ -31,10 +32,12 @@ function AdminComponent() {
 	const tabs = [
 		<AdminProductsTab
 			products={products}
-			categories={categories}
+			firstLevelCategories={firstLevelCategories}
+			secondLevelCategories={secondLevelCategories}
 		/>,
 		<AdminCategoriesTab
-			categories={categories}
+			firstLevelCategories={firstLevelCategories}
+			secondLevelCategories={secondLevelCategories}
 			products={products}
 		/>,
 		<AdminSlidesTab slides={slides} />,
@@ -46,9 +49,9 @@ function AdminComponent() {
 
 	return (
 		<div className='min-h-[80vh] container mx-auto max-sm:px-2 py-8 grid grid-cols-[1fr_2.5fr] max-lg:grid-cols-1 gap-5 animate-opacity-1'>
-			<aside className='bg-white overflow-y-hidden rounded-xl min-w-[360px] max-sm:min-w-min'>
+			<div className='bg-white rounded-md shadow-sm p-4'>
 				<h2 className='text-3xl text-center my-5 font-semibold'>Адмін панель</h2>
-				<ul className='flex flex-col gap-5 py-5 px-6 h-full'>
+				<ul className='flex flex-col gap-5 py-5 px-6 h-full w-full'>
 					<li
 						onClick={() => setCurrentTab(0)}
 						className={`text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
@@ -103,11 +106,11 @@ function AdminComponent() {
 							currentTab === 6 ? 'text-blue-500' : ''
 						}`}
 					>
-						Керування сховищем
+						Сховище
 					</li>
 				</ul>
-			</aside>
-			<div className='bg-white rounded-xl w-full overflow-x-hidden'>{tabs[currentTab]}</div>
+			</div>
+			<div className='bg-white rounded-md shadow-sm w-full'>{tabs[currentTab]}</div>
 		</div>
 	)
 }

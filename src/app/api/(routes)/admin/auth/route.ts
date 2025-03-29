@@ -3,7 +3,7 @@ import { ApiError } from '@/app/api/exceptions/apiError'
 import { handleApiError } from '@/app/api/exceptions/handleApiError'
 import { prisma } from '@/prisma/prisma-client'
 import { TOKEN } from '@/typing/enums'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { NextResponse } from 'next/server'
 import { tokenService } from './tokens'
 

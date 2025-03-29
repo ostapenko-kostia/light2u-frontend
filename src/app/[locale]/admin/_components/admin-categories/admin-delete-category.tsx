@@ -1,23 +1,39 @@
 'use client'
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
-import { useDeleteCategory } from '@/hooks/useCategories'
-import { Category, Product } from '@prisma/client'
+import { useDeleteFirstLevelCategory, useDeleteSecondLevelCategory } from '@/hooks/useCategories'
+import { FirstLevelCategory, Product, SecondLevelCategory } from '@prisma/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { useContext, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 interface Props {
-	category: Category
+	category: FirstLevelCategory | SecondLevelCategory
 	products: Product[] | undefined
+	secondLevelCategories?: SecondLevelCategory[]
 }
 
-export function AdminDeleteCategory({ category, products }: Props) {
+export function AdminDeleteCategory({ category, products, secondLevelCategories }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
 	const queryClient = useQueryClient()
-	const { mutateAsync: deleteFunc, isPending, isSuccess, isError } = useDeleteCategory()
+	const {
+		mutateAsync: deleteFirstLevelFunc,
+		isPending: isFirstLevelPending,
+		isSuccess: isFirstLevelSuccess,
+		isError: isFirstLevelError
+	} = useDeleteFirstLevelCategory()
+	const {
+		mutateAsync: deleteSecondLevelFunc,
+		isPending: isSecondLevelPending,
+		isSuccess: isSecondLevelSuccess,
+		isError: isSecondLevelError
+	} = useDeleteSecondLevelCategory()
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
+
+	const isPending = isFirstLevelPending || isSecondLevelPending
+	const isSuccess = isFirstLevelSuccess || isSecondLevelSuccess
+	const isError = isFirstLevelError || isSecondLevelError
 
 	useEffect(() => {
 		if (isPending) {
@@ -35,17 +51,47 @@ export function AdminDeleteCategory({ category, products }: Props) {
 		}
 	}, [isPending, isSuccess, isError])
 
+	const handleDelete = async () => {
+		if ('parentCategorySlug' in category) {
+			// This is a second level category
+			await deleteSecondLevelFunc(category.id)
+		} else {
+			// This is a first level category
+			await deleteFirstLevelFunc(category.id)
+		}
+	}
+
+	const isDisabled = () => {
+		if ('parentCategorySlug' in category) {
+			// Second level category
+			return !!products?.find(p => p.categorySlug === category.slug)
+		} else {
+			// First level category
+			return (
+				!!products?.find(p => p.categorySlug === category.slug) ||
+				!!secondLevelCategories?.some(cat => cat.parentCategorySlug === category.slug)
+			)
+		}
+	}
+
+	const getDisabledTitle = () => {
+		if ('parentCategorySlug' in category) {
+			return 'Дана категорія використовується в товарах'
+		} else {
+			if (!!secondLevelCategories?.some(cat => cat.parentCategorySlug === category.slug)) {
+				return 'Неможливо видалити категорію з підкатегоріями'
+			}
+			return 'Дана категорія використовується в товарах'
+		}
+	}
+
 	return (
 		<Dialog
 			title='Видалити категорію'
 			trigger={
 				<button
-					disabled={!!products?.find(p => p.categorySlug === category.slug)}
-					title={
-						!!products?.find(p => p.categorySlug === category.slug)
-							? 'Дана категорія використовується'
-							: 'Видалити'
-					}
+					disabled={isDisabled()}
+					title={isDisabled() ? getDisabledTitle() : 'Видалити'}
 					className='ml-4 text-red-600 hover:text-red-900 disabled:text-red-200 disabled:cursor-not-allowed'
 				>
 					Видалити
@@ -53,10 +99,10 @@ export function AdminDeleteCategory({ category, products }: Props) {
 			}
 		>
 			<div className='flex flex-col items-start gap-6'>
-				<p>Ви дійсно хочете видалити категорію {(category.name as any).uk}?</p>
+				<p>Ви дійсно хочете видалити категорію {(category.name as { uk: string }).uk}?</p>
 				<button
 					className='bg-gray-800 text-white rounded-md px-6 py-2 hover:bg-gray-700'
-					onClick={() => deleteFunc(category.id)}
+					onClick={handleDelete}
 				>
 					Так
 				</button>

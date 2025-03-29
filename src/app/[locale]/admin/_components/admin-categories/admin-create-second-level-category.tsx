@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
-import { useCreateSecondLevelCategory, useGetFirstLevelCategories } from '@/hooks/useCategories'
+import { useCreateSecondLevelCategory } from '@/hooks/useCategories'
 import { useQueryClient } from '@tanstack/react-query'
 import { PlusIcon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
@@ -11,19 +11,19 @@ import toast from 'react-hot-toast'
 
 interface Form {
 	image: FileList
-	name: {
-		uk: string
-		ru: string
-	}
+	nameUk: string
+	nameRu: string
+}
+
+interface Props {
 	parentCategorySlug: string
 }
 
-export function AdminCreateCategory() {
+export function AdminCreateSecondLevelCategory({ parentCategorySlug }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
 	const { register, handleSubmit, setValue } = useForm<Form>()
 	const queryClient = useQueryClient()
 	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useCreateSecondLevelCategory()
-	const { data: firstLevelCategories } = useGetFirstLevelCategories()
 
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
@@ -45,27 +45,15 @@ export function AdminCreateCategory() {
 	}, [isPending, isSuccess, isError])
 
 	const onSubmit = (data: Form) => {
-		const formData = {
-			image: data.image,
-			name: {
-				uk: data.name.uk,
-				ru: data.name.ru
-			},
-			parentCategorySlug: data.parentCategorySlug
-		}
-		createFunc(formData)
+		createFunc({ ...data, parentCategorySlug })
 	}
 
 	return (
 		<Dialog
-			title='Створити категорію'
+			title='Створити категорію другого рівня'
 			trigger={
-				<button className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center justify-center gap-2'>
-					<PlusIcon
-						color='#fff'
-						size={20}
-					/>{' '}
-					Додати категорію
+				<button className='bg-white text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 flex items-center justify-center gap-1.5 text-sm border border-gray-200'>
+					<PlusIcon size={16} /> Додати підкатегорію
 				</button>
 			}
 		>
@@ -98,7 +86,7 @@ export function AdminCreateCategory() {
 						required
 						placeholder='Категорія'
 						id='nameUk'
-						{...register('name.uk', { required: true })}
+						{...register('nameUk', { required: true })}
 					/>
 				</div>
 				<div className='flex items-start flex-col gap-3'>
@@ -114,32 +102,8 @@ export function AdminCreateCategory() {
 						required
 						placeholder='Категорія'
 						id='nameRu'
-						{...register('name.ru', { required: true })}
+						{...register('nameRu', { required: true })}
 					/>
-				</div>
-				<div className='flex items-start flex-col gap-3'>
-					<label
-						htmlFor='parentCategory'
-						className='flex items-center gap-2'
-					>
-						Батьківська категорія
-					</label>
-					<select
-						className='w-full rounded-md border border-gray-500 bg-white px-5 py-3 text-sm placeholder:text-gray-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
-						id='parentCategory'
-						required
-						{...register('parentCategorySlug', { required: true })}
-					>
-						<option value=''>Виберіть категорію</option>
-						{firstLevelCategories?.map(category => (
-							<option
-								key={category.id}
-								value={category.slug}
-							>
-								{(category.name as { uk: string }).uk}
-							</option>
-						))}
-					</select>
 				</div>
 				<button
 					type='submit'

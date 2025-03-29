@@ -1,63 +1,94 @@
 import { categoriesService } from '@/services/categories.service'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-export function useGetCategories() {
+export function useGetFirstLevelCategories() {
 	return useQuery({
-		queryKey: ['categories get'],
-		queryFn: async () => {
-			const res = await categoriesService.getAllCategories()
-			if (!res?.data) return Promise.reject()
-			return res.data
+		queryKey: ['categories get first level'],
+		queryFn: () => categoriesService.getAllFirstLevelCategories()
+	})
+}
+
+export function useGetSecondLevelCategories() {
+	return useQuery({
+		queryKey: ['categories get second level'],
+		queryFn: () => categoriesService.getAllSecondLevelCategories()
+	})
+}
+
+export function useCreateFirstLevelCategory() {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: (data: { nameUk: string; nameRu: string; image: FileList }) => {
+			const formData = new FormData()
+			formData.append('name', JSON.stringify({ uk: data.nameUk, ru: data.nameRu }))
+			formData.append('image', data.image[0])
+			return categoriesService.createFirstLevelCategory(formData)
 		},
-		refetchOnWindowFocus: false
-	})
-}
-
-export function useCreateCategory() {
-	return useMutation({
-		mutationKey: ['category create'],
-		mutationFn: async ({
-			nameRu,
-			image,
-			nameUa
-		}: {
-			image: FileList
-			nameUa: string
-			nameRu: string
-		}) => {
-			const name = {
-				ru: nameRu,
-				uk: nameUa
-			}
-			const res = await categoriesService.createCategory({ image, name })
-			if (!res?.data) return Promise.reject()
-			return res
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['categories get first level'] })
 		}
 	})
 }
 
-export function useEditCategory() {
+export function useCreateSecondLevelCategory() {
+	const queryClient = useQueryClient()
 	return useMutation({
-		mutationKey: ['category edit'],
-		mutationFn: async (data: {
+		mutationFn: (data: { nameUk: string; nameRu: string; image: FileList; parentCategorySlug: string }) => {	
+			const formData = new FormData()
+			formData.append('name', JSON.stringify({ uk: data.nameUk, ru: data.nameRu }))
+			formData.append('image', data.image[0])
+			formData.append('parentCategorySlug', data.parentCategorySlug)
+			return categoriesService.createSecondLevelCategory(formData)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['categories get second level'] })
+		}
+	})
+}
+
+export function useEditFirstLevelCategory() {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: (data: { id: number; nameUk: string; nameRu: string; image?: FileList }) =>
+			categoriesService.editFirstLevelCategory(data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['categories get first level'] })
+		}
+	})
+}
+
+export function useEditSecondLevelCategory() {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: (data: {
 			id: number
+			nameUk: string
+			nameRu: string
 			image?: FileList
-			nameUa?: string
-			nameRu?: string
-		}) => {
-			const res = await categoriesService.editCategory(data)
-			if (!res?.data) return Promise.reject()
-			return res
+			parentCategorySlug: string
+		}) => categoriesService.editSecondLevelCategory(data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['categories get second level'] })
 		}
 	})
 }
-export function useDeleteCategory() {
+
+export function useDeleteFirstLevelCategory() {
+	const queryClient = useQueryClient()
 	return useMutation({
-		mutationKey: ['category delete'],
-		mutationFn: async (id: number) => {
-			const res = await categoriesService.deleteCategory(id)
-			if (!res?.data) return Promise.reject()
-			return res
+		mutationFn: (id: number) => categoriesService.deleteFirstLevelCategory(id),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['categories get first level'] })
+		}
+	})
+}
+
+export function useDeleteSecondLevelCategory() {
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationFn: (id: number) => categoriesService.deleteSecondLevelCategory(id),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['categories get second level'] })
 		}
 	})
 }

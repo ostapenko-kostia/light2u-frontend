@@ -2,30 +2,47 @@
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
-import { useEditCategory } from '@/hooks/useCategories'
-import { Category } from '@prisma/client'
+import { useEditFirstLevelCategory, useEditSecondLevelCategory } from '@/hooks/useCategories'
+import { FirstLevelCategory, SecondLevelCategory } from '@prisma/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { useContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 interface Props {
-	category: Category
+	category: FirstLevelCategory | SecondLevelCategory
 }
 
 interface Form {
 	image: FileList
-	nameUa: string
-	nameRu: string
+	name: {
+		uk: string
+		ru: string
+	}
 }
 
 export function AdminEditCategory({ category }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
 	const queryClient = useQueryClient()
 	const { register, handleSubmit, setValue } = useForm<Form>()
-	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useEditCategory()
+	const {
+		mutateAsync: editFirstLevelFunc,
+		isPending: isFirstLevelPending,
+		isSuccess: isFirstLevelSuccess,
+		isError: isFirstLevelError
+	} = useEditFirstLevelCategory()
+	const {
+		mutateAsync: editSecondLevelFunc,
+		isPending: isSecondLevelPending,
+		isSuccess: isSecondLevelSuccess,
+		isError: isSecondLevelError
+	} = useEditSecondLevelCategory()
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
+
+	const isPending = isFirstLevelPending || isSecondLevelPending
+	const isSuccess = isFirstLevelSuccess || isSecondLevelSuccess
+	const isError = isFirstLevelError || isSecondLevelError
 
 	useEffect(() => {
 		if (isPending) {
@@ -44,12 +61,23 @@ export function AdminEditCategory({ category }: Props) {
 	}, [isPending, isSuccess, isError])
 
 	const edit = async (data: Form) => {
-		await editFunc({
+		const formData = {
 			id: category.id,
-			nameUa: data.nameUa ?? undefined,
-			nameRu: data.nameRu ?? undefined,
+			nameUk: data.name.uk,
+			nameRu: data.name.ru,
 			image: data.image ?? undefined
-		})
+		}
+
+		if ('parentCategorySlug' in category) {
+			// This is a second level category - keep the existing parentCategorySlug
+			await editSecondLevelFunc({
+				...formData,
+				parentCategorySlug: category.parentCategorySlug
+			})
+		} else {
+			// This is a first level category
+			await editFirstLevelFunc(formData)
+		}
 	}
 
 	return (
@@ -75,7 +103,7 @@ export function AdminEditCategory({ category }: Props) {
 				</div>
 				<div className='flex items-start flex-col gap-3'>
 					<label
-						htmlFor='cat'
+						htmlFor='nameUk'
 						className='flex items-center gap-2'
 					>
 						Назва (укр)
@@ -84,14 +112,14 @@ export function AdminEditCategory({ category }: Props) {
 						className='w-full rounded-md border border-gray-500 bg-white px-5 py-3 text-sm placeholder:text-gray-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
 						type='text'
 						placeholder='Категорія'
-						id='cat'
-						defaultValue={(category.name as any).uk}
-						{...register('nameUa')}
+						id='nameUk'
+						defaultValue={(category.name as { uk: string }).uk}
+						{...register('name.uk')}
 					/>
 				</div>
 				<div className='flex items-start flex-col gap-3'>
 					<label
-						htmlFor='cat'
+						htmlFor='nameRu'
 						className='flex items-center gap-2'
 					>
 						Назва (рус)
@@ -99,10 +127,10 @@ export function AdminEditCategory({ category }: Props) {
 					<input
 						className='w-full rounded-md border border-gray-500 bg-white px-5 py-3 text-sm placeholder:text-gray-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
 						type='text'
-						defaultValue={(category.name as any).ru}
+						defaultValue={(category.name as { ru: string }).ru}
 						placeholder='Категорія'
-						id='cat'
-						{...register('nameRu')}
+						id='nameRu'
+						{...register('name.ru')}
 					/>
 				</div>
 				<button

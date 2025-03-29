@@ -1,45 +1,79 @@
 import { api } from '@/lib/axios'
-import { Category } from '@prisma/client'
+import { FirstLevelCategory, SecondLevelCategory } from '@prisma/client'
 
 class CategoriesService {
-	async getAllCategories() {
+	async getAllFirstLevelCategories() {
 		try {
-			const res = await api.get<Category[]>('/categories/all')
-			if (res.status != 200) throw new Error('Помилка при отриманні категорій')
-			return res
+			const res = await api.get<FirstLevelCategory[]>('/first-level-categories/all')
+			if (res.status != 200) throw new Error('Помилка при отриманні категорій першого рівня')
+			return res.data
 		} catch {}
 	}
 
-	async createCategory({ name, image }: { name: { uk: string; ru: string }; image: FileList }) {
-		const formData = new FormData()
-		formData.append('name', JSON.stringify(name))
-		formData.append('image', image[0])
-		return await api.post('/categories/create', formData, {
+	async getAllSecondLevelCategories() {
+		try {
+			const res = await api.get<SecondLevelCategory[]>('/second-level-categories/all')
+			if (res.status != 200) throw new Error('Помилка при отриманні категорій другого рівня')
+			return res.data
+		} catch {}
+	}
+
+	async createFirstLevelCategory(formData: FormData) {
+		return await api.post('/first-level-categories/create', formData, {
 			headers: { 'Content-Type': 'multipart/form-data' }
 		})
 	}
 
-	async editCategory({
+	async createSecondLevelCategory(formData: FormData) {
+		return await api.post('/second-level-categories/create', formData, {
+			headers: { 'Content-Type': 'multipart/form-data' }
+		})
+	}
+
+	async editFirstLevelCategory({
 		id,
-		nameUa,
+		nameUk,
 		nameRu,
 		image
 	}: {
 		id: number
-		nameUa?: string
+		nameUk?: string
 		nameRu?: string
 		image?: FileList
 	}) {
 		const formData = new FormData()
-		formData.append('name', JSON.stringify({ uk: nameUa, ru: nameRu }))
+		formData.append('name', JSON.stringify({ uk: nameUk, ru: nameRu }))
 		if (image) formData.append('image', image[0])
-		return await api.put(`/categories/edit/${id}`, formData, {
+		return await api.put(`/first-level-categories/edit/${id}`, formData, {
 			headers: { 'Content-Type': 'multipart/form-data' }
 		})
 	}
 
-	async deleteCategory(id: number) {
-		return await api.delete(`/categories/delete/${id}`)
+	async editSecondLevelCategory({
+		id,
+		nameUk,
+		nameRu,
+		image
+	}: {
+		id: number
+		nameUk?: string
+		nameRu?: string
+		image?: FileList
+	}) {
+		const formData = new FormData()
+		formData.append('name', JSON.stringify({ uk: nameUk, ru: nameRu }))
+		if (image) formData.append('image', image[0])
+		return await api.put(`/second-level-categories/edit/${id}`, formData, {
+			headers: { 'Content-Type': 'multipart/form-data' }
+		})
+	}
+
+	async deleteFirstLevelCategory(id: number) {
+		return await api.delete(`/first-level-categories/delete/${id}`)
+	}
+
+	async deleteSecondLevelCategory(id: number) {
+		return await api.delete(`/second-level-categories/delete/${id}`)
 	}
 }
 

@@ -16,30 +16,51 @@ model Product {
   description String
   price       Int
 
-  materials  String
-  dimensions String
-  weight     String
-  power      String
-  voltage    Int
-  bulb       String
-  bulbColor  String
-  bulbType   String
-
   locale String @default("uk")
 
-  category     Category @relation(fields: [categorySlug], references: [slug])
+  info         ProductInfo[]
+  category     SecondLevelCategory      @relation(fields: [categorySlug], references: [slug])
   categorySlug String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Category {
+model ProductInfo {
+  id Int @id @unique @default(autoincrement())
+
+  key   String
+  value String
+
+  product   Product @relation(references: [id], fields: [productId])
+  productId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FirstLevelCategory {
   id   Int    @id @unique @default(autoincrement())
   slug String @unique
 
   image String
   name  Json
+
+  childrenCategories SecondLevelCategory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SecondLevelCategory {
+  id   Int    @id @unique @default(autoincrement())
+  slug String @unique
+
+  image String
+  name  Json
+
+  parentCategory     FirstLevelCategory @relation(fields: [parentCategorySlug], references: [slug])
+  parentCategorySlug String
 
   products Product[]
 

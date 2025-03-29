@@ -1,20 +1,39 @@
 'use client'
 
 import { ProductCard } from '@/components/layout/product-card'
-import type { Category, Product } from '@prisma/client'
-import { useState } from 'react'
+import type { FirstLevelCategory, Product, ProductInfo, SecondLevelCategory } from '@prisma/client'
+import { ChevronDownIcon, ChevronRightIcon } from 'lucide-react'
+import { Fragment, useState } from 'react'
 import { AdminProductCreate } from './admin-product-create'
 import { AdminProductDelete } from './admin-product-delete'
 import { AdminProductEdit } from './admin-product-edit'
 import { AdminProductInfo } from './admin-product-info'
 
-interface Props {
-	products: Product[] | undefined
-	categories: Category[] | undefined
+type ProductWithInfo = Product & {
+	info: ProductInfo[]
 }
 
-export function AdminProductsTab({ products, categories }: Props) {
+interface Props {
+	products: ProductWithInfo[] | undefined
+	firstLevelCategories: FirstLevelCategory[] | undefined
+	secondLevelCategories: SecondLevelCategory[] | undefined
+}
+
+export function AdminProductsTab({ products, firstLevelCategories, secondLevelCategories }: Props) {
 	const [currentLocale, setCurrentLocale] = useState<'uk' | 'ru'>('uk')
+	const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
+
+	const toggleCategory = (slug: string) => {
+		setExpandedCategories(prev => {
+			const newSet = new Set(prev)
+			if (newSet.has(slug)) {
+				newSet.delete(slug)
+			} else {
+				newSet.add(slug)
+			}
+			return newSet
+		})
+	}
 
 	// Filter products by locale
 	const ukProducts = products?.filter(product => product.locale === 'uk' || !product.locale)
@@ -50,44 +69,91 @@ export function AdminProductsTab({ products, categories }: Props) {
 					</button>
 				</div>
 			</div>
-			<div className='grid grid-cols-3 max-sm:grid-cols-2 max-[450px]:!grid-cols-1 w-full gap-10'>
-				{filteredProducts ? (
-					<>
-						{filteredProducts.map(product => {
-							const categoryName =
-								(categories?.find(category => category.slug === product.categorySlug)?.name as any)
-									?.uk ?? 'Без категорії'
-							return (
-								<div
-									className='relative max-[500px]:pr-0'
-									key={product.id}
-								>
-									<div className='absolute w-1/2 z-10 flex items-center justify-around max-[500px]:gap-4 max-[500px]:justify-between p-0 right-0 bottom-0 rounded-md'>
-										<AdminProductInfo
-											product={product}
-											categoryName={categoryName}
-										/>
-										<AdminProductEdit
-											product={product}
-											categories={categories}
-										/>
-										<AdminProductDelete
-											productId={product.id}
-											productName={product.name}
-										/>
-									</div>
-									<ProductCard product={product} />
+
+			<div className='space-y-4'>
+				{firstLevelCategories?.map(firstCategory => {
+					const secondCategories = secondLevelCategories?.filter(
+						cat => cat.parentCategorySlug === firstCategory.slug
+					)
+					const categoryProducts = filteredProducts?.filter(product =>
+						secondCategories?.some(cat => cat.slug === product.categorySlug)
+					)
+
+					return (
+						<Fragment key={firstCategory.id}>
+							<div
+								className='bg-gray-50 p-4 rounded-lg cursor-pointer hover:bg-gray-100 flex items-center justify-between'
+								onClick={() => toggleCategory(firstCategory.slug)}
+							>
+								<div className='flex items-center gap-2'>
+									{expandedCategories.has(firstCategory.slug) ? (
+										<ChevronDownIcon size={20} />
+									) : (
+										<ChevronRightIcon size={20} />
+									)}
+									<span className='font-medium'>{(firstCategory.name as { uk: string }).uk}</span>
 								</div>
-							)
-						})}
-						<AdminProductCreate
-							categories={categories}
-							locale={currentLocale}
-						/>
-					</>
-				) : (
-					<p>Отримання товарів з бази даних...</p>
-				)}
+								<span className='text-sm text-gray-500'>
+									{categoryProducts?.length || 0} товарів
+								</span>
+							</div>
+
+							{expandedCategories.has(firstCategory.slug) && (
+								<div className='ml-8 space-y-4'>
+									{secondCategories?.map(secondCategory => {
+										const categoryProducts = filteredProducts?.filter(
+											product => product.categorySlug === secondCategory.slug
+										)
+
+										return (
+											<div
+												key={secondCategory.id}
+												className='bg-white p-4 rounded-lg border border-gray-100'
+											>
+												<div className='flex items-center justify-between mb-4'>
+													<h3 className='font-medium'>
+														{(secondCategory.name as { uk: string }).uk}
+													</h3>
+													<span className='text-sm text-gray-500'>
+														{categoryProducts?.length || 0} товарів
+													</span>
+												</div>
+												<div className='grid grid-cols-3 max-sm:grid-cols-2 max-[450px]:!grid-cols-1 gap-4'>
+													{categoryProducts?.map(product => (
+														<div
+															className='relative max-[500px]:pr-0'
+															key={product.id}
+														>
+															<div className='absolute w-1/2 z-10 flex items-center justify-around max-[500px]:gap-4 max-[500px]:justify-between p-0 right-0 bottom-0 rounded-md'>
+																<AdminProductInfo
+																	product={product}
+																	categoryName={(secondCategory.name as { uk: string }).uk}
+																/>
+																<AdminProductEdit
+																	product={product}
+																	categories={secondCategories}
+																/>
+																<AdminProductDelete
+																	productId={product.id}
+																	productName={product.name}
+																/>
+															</div>
+															<ProductCard product={product} />
+														</div>
+													))}
+													<AdminProductCreate
+														category={secondCategory}
+														locale={currentLocale}
+													/>
+												</div>
+											</div>
+										)
+									})}
+								</div>
+							)}
+						</Fragment>
+					)
+				})}
 			</div>
 		</div>
 	)

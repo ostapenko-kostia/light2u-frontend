@@ -13,14 +13,20 @@ const productSchema = Joi.object({
 	price: Joi.number().integer().positive().optional(),
 	description: Joi.string().optional(),
 	categorySlug: Joi.string().optional(),
-	materials: Joi.string().optional(),
-	dimensions: Joi.string().optional(),
-	weight: Joi.string().optional(),
-	power: Joi.string().optional(),
-	voltage: Joi.number().integer().positive().optional(),
-	bulb: Joi.string().optional(),
-	bulbColor: Joi.string().optional(),
-	bulbType: Joi.string().optional(),
+	productInfo: Joi.array()
+		.items(
+			Joi.object({
+				key: Joi.string().min(1).required().messages({
+					'string.empty': "Ключ обов'язковий до заповнення",
+					'any.required': "Ключ обов'язковий до заповнення"
+				}),
+				value: Joi.string().min(1).required().messages({
+					'string.empty': "Значення обов'язкове до заповнення",
+					'any.required': "Значення обов'язкове до заповнення"
+				})
+			})
+		)
+		.optional(),
 	locale: Joi.string().valid('uk', 'ru').default('uk').messages({
 		'string.empty': 'Locale is required',
 		'any.only': 'Locale must be either "uk" or "ru"'
@@ -95,11 +101,25 @@ export async function PUT(
 		}
 
 		const { info: _, ...valueWithoutInfo } = value
+		const { productInfoFromValue, ...valueWithoutProductInfo } = valueWithoutInfo
 
 		if (valueWithoutInfo) {
 			await prisma.product.update({
 				where: { id: Number(productId) },
-				data: valueWithoutInfo
+				data: valueWithoutProductInfo
+			})
+		}
+
+		if (productInfoFromValue) {
+			await prisma.productInfo.deleteMany({
+				where: { productId: Number(productId) }
+			})
+			
+			await prisma.productInfo.createMany({
+				data: productInfoFromValue.map((info: any) => ({
+					productId: Number(productId),
+					...info
+				}))
 			})
 		}
 

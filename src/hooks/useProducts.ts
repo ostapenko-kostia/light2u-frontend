@@ -1,5 +1,25 @@
 import { productsService } from '@/services/products.service'
+import type { Product, ProductInfo } from '@prisma/client'
 import { useMutation, useQuery } from '@tanstack/react-query'
+
+type ProductWithInfo = Product & {
+	info: ProductInfo[]
+}
+
+interface ProductInfoInput {
+	key: string
+	value: string
+}
+
+interface BaseProductData {
+	name: string
+	price: number
+	images: FileList
+	description: string
+	categorySlug: string
+	locale: string
+	productInfo: ProductInfoInput[]
+}
 
 export const useGetProducts = () => {
 	return useQuery({
@@ -7,7 +27,7 @@ export const useGetProducts = () => {
 		queryFn: async () => {
 			const res = await productsService.getAllProducts()
 			if (!res?.data) return Promise.reject()
-			return res.data
+			return res.data as ProductWithInfo[]
 		},
 		refetchOnWindowFocus: false
 	})
@@ -25,26 +45,9 @@ export const useDeleteProduct = () => {
 }
 
 export const useCreateProduct = () => {
-	interface Props {
-		name: string
-		price: number
-		images: FileList
-		description: string
-		categorySlug: string
-		materials: string
-		dimensions: string
-		weight: string
-		power: string
-		voltage: number
-		bulb: string
-		bulbColor: string
-		bulbType: string
-		locale: string
-	}
-
 	return useMutation({
 		mutationKey: ['product create'],
-		mutationFn: async (data: Props) => {
+		mutationFn: async (data: BaseProductData) => {
 			const formData = new FormData()
 
 			Array.from(data.images).forEach(el => {
@@ -61,26 +64,9 @@ export const useCreateProduct = () => {
 }
 
 export const useUpdateProduct = () => {
-	interface Props {
-		name?: string
-		price?: number
-		images?: FileList
-		description?: string
-		categorySlug?: string
-		materials?: string
-		dimensions?: string
-		weight?: string
-		power?: string
-		voltage?: number
-		bulb?: string
-		bulbColor?: string
-		bulbType?: string
-		locale?: string
-	}
-
 	return useMutation({
 		mutationKey: ['product edit'],
-		mutationFn: async ({ id, data }: { id: number; data: Props }) => {
+		mutationFn: async ({ id, data }: { id: number; data: Partial<BaseProductData> }) => {
 			const formData = new FormData()
 
 			if (data.images) {
@@ -89,7 +75,9 @@ export const useUpdateProduct = () => {
 				})
 			}
 			const dataForForm = Object.entries(data).reduce((acc, [key, value]) => {
-				if (key !== 'images') acc[key] = value
+				if (key !== 'images') {
+					acc[key] = typeof value === 'object' ? JSON.stringify(value) : String(value)
+				}
 				if (!value && key !== 'isNew') delete acc[key]
 				return acc
 			}, {} as Record<string, string>)

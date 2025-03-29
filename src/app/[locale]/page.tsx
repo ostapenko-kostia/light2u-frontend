@@ -9,7 +9,7 @@ export const revalidate = 180
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
 	const locale = (await params).locale
-	const categories = (await categoriesService.getAllCategories())?.data
+	const firstLevelCategories = await categoriesService.getAllFirstLevelCategories()
 	const slides = (await slideService.getAllSlides())?.data
 	const galleries = (await galleryService.getAll())?.data
 
@@ -22,7 +22,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 		<section>
 			<Hero slides={localizedSlides} />
 			<HomeCategories
-				categories={categories}
+				categories={firstLevelCategories}
 				locale={locale}
 			/>
 			<HomeGallery galleries={galleries} />

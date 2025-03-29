@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
 	try {
-		const categories = await prisma.category.findMany()
+		const categories = await prisma.secondLevelCategory.findMany()
 		return NextResponse.json(categories, { status: 200 })
 	} catch (error) {
 		return handleApiError(error)

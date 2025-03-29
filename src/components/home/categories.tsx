@@ -1,5 +1,5 @@
 import { getServerTranslation } from '@/lib/server-translation'
-import { Category } from '@prisma/client'
+import { FirstLevelCategory } from '@prisma/client'
 import * as motion from 'framer-motion/client'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -9,7 +9,7 @@ export async function HomeCategories({
 	categories,
 	locale
 }: {
-	categories: Category[] | undefined
+	categories: FirstLevelCategory[] | undefined
 	locale: string
 }) {
 	const { t } = await getServerTranslation(locale)
@@ -29,7 +29,7 @@ export async function HomeCategories({
 							key={category.id}
 						>
 							<Link
-								href={`/catalog?category=${category.slug}`}
+								href={`/catalog?firstLevelCategory=${category.slug}`}
 								className='w-full h-full flex flex-col gap-3'
 							>
 								<div className='relative w-full h-full rounded-sm aspect-square overflow-hidden'>

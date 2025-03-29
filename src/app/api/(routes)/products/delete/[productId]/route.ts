@@ -17,7 +17,8 @@ export async function DELETE(
 		if (!isAdmin) throw new ApiError('You are not admin', 403)
 
 		const product = await prisma.product.findUnique({
-			where: { id: productId }
+			where: { id: productId },
+			include: { info: true }
 		})
 
 		if (!product) throw new ApiError('Product not found', 404)
@@ -31,6 +32,12 @@ export async function DELETE(
 						console.warn(`Failed to delete file: ${image}`, error)
 					}
 				}
+			}
+		}
+
+		if (product.info) {
+			for (const info of product.info) {
+				await prisma.productInfo.delete({ where: { id: info.id } })
 			}
 		}
 

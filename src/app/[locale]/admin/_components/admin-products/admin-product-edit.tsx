@@ -2,11 +2,11 @@
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { useUpdateProduct } from '@/hooks/useProducts'
-import { Category, Product } from '@prisma/client'
+import { Product, ProductInfo, SecondLevelCategory } from '@prisma/client'
 import { useQueryClient } from '@tanstack/react-query'
-import { EditIcon } from 'lucide-react'
+import { EditIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 interface Form {
@@ -15,26 +15,30 @@ interface Form {
 	images: FileList
 	description?: string
 	categorySlug?: string
-	materials?: string
-	dimensions?: string
-	weight?: string
-	power?: string
-	voltage?: number
-	bulb?: string
-	bulbColor?: string
-	bulbType?: string
 	locale?: string
+	productInfo: { key: string; value: string }[]
 }
 
 interface Props {
-	categories: Category[] | undefined
-	product: Product
+	categories: SecondLevelCategory[] | undefined
+	product: Product & { info: ProductInfo[] }
 }
 
 export function AdminProductEdit({ categories, product }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
 	const queryClient = useQueryClient()
-	const { register, handleSubmit, setValue } = useForm<Form>()
+	const { register, handleSubmit, setValue, control } = useForm<Form>({
+		defaultValues: {
+			productInfo: product.info.map(info => ({
+				key: info.key,
+				value: info.value
+			}))
+		}
+	})
+	const { fields, append, remove } = useFieldArray({
+		control,
+		name: 'productInfo'
+	})
 	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useUpdateProduct()
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
@@ -65,6 +69,16 @@ export function AdminProductEdit({ categories, product }: Props) {
 
 	const handleCategoryChange = (value: string) => {
 		setValue('categorySlug', value)
+	}
+
+	const addProductInfo = () => {
+		append({ key: '', value: '' })
+	}
+
+	const removeProductInfo = (index: number) => {
+		if (fields.length > 1) {
+			remove(index)
+		}
 	}
 
 	return (
@@ -128,99 +142,10 @@ export function AdminProductEdit({ categories, product }: Props) {
 								key={category.id}
 								value={category.slug}
 							>
-								{(category.name as any).uk}
+								{(category.name as { uk: string }).uk}
 							</option>
 						))}
 					</select>
-				</div>
-
-				<div className='flex flex-col gap-2'>
-					<label htmlFor='materials'>Матеріали</label>
-					<input
-						id='materials'
-						defaultValue={product.materials}
-						placeholder='Наприклад: Метал, Кристал, Скло'
-						className='border border-gray-200 rounded-md p-2'
-						{...register('materials')}
-					/>
-				</div>
-
-				<div className='flex flex-col gap-2'>
-					<label htmlFor='dimensions'>Розміри</label>
-					<input
-						id='dimensions'
-						defaultValue={product.dimensions}
-						placeholder='Наприклад: 60x60x40 см'
-						className='border border-gray-200 rounded-md p-2'
-						{...register('dimensions')}
-					/>
-				</div>
-
-				<div className='flex flex-col gap-2'>
-					<label htmlFor='weight'>Вага</label>
-					<input
-						id='weight'
-						defaultValue={product.weight}
-						placeholder='Наприклад: 2.5 кг'
-						className='border border-gray-200 rounded-md p-2'
-						{...register('weight')}
-					/>
-				</div>
-
-				<div className='flex flex-col gap-2'>
-					<label htmlFor='power'>Потужність</label>
-					<input
-						id='power'
-						defaultValue={product.power}
-						placeholder='Наприклад: 60W'
-						className='border border-gray-200 rounded-md p-2'
-						{...register('power')}
-					/>
-				</div>
-
-				<div className='flex flex-col gap-2'>
-					<label htmlFor='voltage'>Напруга</label>
-					<input
-						id='voltage'
-						type='number'
-						defaultValue={product.voltage}
-						placeholder='Наприклад: 220'
-						className='border border-gray-200 rounded-md p-2'
-						{...register('voltage', { valueAsNumber: true })}
-					/>
-				</div>
-
-				<div className='flex flex-col gap-2'>
-					<label htmlFor='bulb'>Лампочка</label>
-					<input
-						id='bulb'
-						defaultValue={product.bulb}
-						placeholder='Наприклад: E27'
-						className='border border-gray-200 rounded-md p-2'
-						{...register('bulb')}
-					/>
-				</div>
-
-				<div className='flex flex-col gap-2'>
-					<label htmlFor='bulbColor'>Колір лампочки</label>
-					<input
-						id='bulbColor'
-						defaultValue={product.bulbColor}
-						placeholder='Наприклад: Теплий білий'
-						className='border border-gray-200 rounded-md p-2'
-						{...register('bulbColor')}
-					/>
-				</div>
-
-				<div className='flex flex-col gap-2'>
-					<label htmlFor='bulbType'>Тип лампочки</label>
-					<input
-						id='bulbType'
-						defaultValue={product.bulbType}
-						placeholder='Наприклад: LED'
-						className='border border-gray-200 rounded-md p-2'
-						{...register('bulbType')}
-					/>
 				</div>
 
 				<div className='flex flex-col gap-2'>
@@ -232,6 +157,51 @@ export function AdminProductEdit({ categories, product }: Props) {
 						className='border border-gray-200 rounded-md p-2'
 						{...register('description')}
 					/>
+				</div>
+
+				<div className='flex flex-col gap-4'>
+					<div className='flex items-center justify-between'>
+						<label>Додаткова інформація</label>
+						<button
+							type='button'
+							onClick={addProductInfo}
+							className='flex items-center gap-2 text-blue-600 hover:text-blue-800'
+						>
+							<PlusIcon size={16} />
+							Додати поле
+						</button>
+					</div>
+					{fields.map((field, index) => (
+						<div
+							key={field.id}
+							className='flex items-center gap-4'
+						>
+							<div className='flex-1'>
+								<input
+									placeholder='Назва поля'
+									className='border border-gray-200 rounded-md p-2 w-full'
+									defaultValue={field.key}
+									{...register(`productInfo.${index}.key`)}
+								/>
+							</div>
+							<div className='flex-1'>
+								<input
+									placeholder='Значення'
+									className='border border-gray-200 rounded-md p-2 w-full'
+									defaultValue={field.value}
+									{...register(`productInfo.${index}.value`)}
+								/>
+							</div>
+							<button
+								type='button'
+								onClick={() => removeProductInfo(index)}
+								className='text-red-600 hover:text-red-800'
+								disabled={fields.length === 1}
+							>
+								<Trash2Icon size={20} />
+							</button>
+						</div>
+					))}
 				</div>
 
 				<button

@@ -4,7 +4,14 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { Product as ProductType } from '@prisma/client'
 import Link from 'next/link'
 
-export function Product({ product }: { product: ProductType }) {
+interface ProductWithInfo extends ProductType {
+	info: {
+		key: string
+		value: string
+	}[]
+}
+
+export function Product({ product }: { product: ProductWithInfo }) {
 	const { t } = useTranslation()
 
 	return (
@@ -26,38 +33,16 @@ export function Product({ product }: { product: ProductType }) {
 				{t('product-info-title')}
 			</h3>
 			<ul className='flex flex-col gap-2 items-start text-start max-[500px]:!text-sm'>
-				<li className='flex items-center gap-2'>
-					<span className='font-medium text-[#121212BF]'>{t('product-materials-field')}:</span>
-					<span className='font-light'>{product.materials}</span>
-				</li>
-				<li className='flex items-center gap-2'>
-					<span className='font-medium text-[#121212BF]'>{t('product-size-field')}:</span>
-					<span className='font-light'>{product.dimensions}</span>
-				</li>
-				<li className='flex items-center gap-2'>
-					<span className='font-medium text-[#121212BF]'>{t('product-weight-field')}:</span>
-					<span className='font-light'>{product.weight}</span>
-				</li>
-				<li className='flex items-center gap-2'>
-					<span className='font-medium text-[#121212BF]'>{t('product-power-field')}:</span>
-					<span className='font-light'>{product.power}</span>
-				</li>
-				<li className='flex items-center gap-2'>
-					<span className='font-medium text-[#121212BF]'>{t('product-voltage-field')}:</span>
-					<span className='font-light'>{product.voltage} В</span>
-				</li>
-				<li className='flex items-center gap-2'>
-					<span className='font-medium text-[#121212BF]'>{t('product-bulb-field')}:</span>
-					<span className='font-light'>{product.bulb}</span>
-				</li>
-				<li className='flex items-center gap-2'>
-					<span className='font-medium text-[#121212BF]'>{t('product-bulb-color-field')}:</span>
-					<span className='font-light'>{product.bulbColor}</span>
-				</li>
-				<li className='flex items-center gap-2'>
-					<span className='font-medium text-[#121212BF]'>{t('product-bulb-type-field')}:</span>
-					<span className='font-light'>{product.bulbType}</span>
-				</li>
+				{product.info &&
+					product.info.map(i => (
+						<li
+							key={i.key}
+							className='flex items-center gap-2'
+						>
+							<span className='font-medium text-[#121212BF]'>{i.key}:</span>
+							<span className='font-light'>{i.value}</span>
+						</li>
+					))}
 			</ul>
 		</>
 	)

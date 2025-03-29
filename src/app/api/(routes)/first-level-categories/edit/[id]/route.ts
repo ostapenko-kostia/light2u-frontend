@@ -1,11 +1,12 @@
 import { ApiError } from '@/app/api/exceptions/apiError'
 import { handleApiError } from '@/app/api/exceptions/handleApiError'
+import { deleteFile } from '@/app/api/utils/deleteFile'
 import { saveFile } from '@/app/api/utils/saveFile'
 import { prisma } from '@/prisma/prisma-client'
 import slugify from '@sindresorhus/slugify'
 import Joi from 'joi'
 import { NextRequest, NextResponse } from 'next/server'
-import { checkIsAdmin } from '../../admin/auth/utils/checkIsAdmin'
+import { checkIsAdmin } from '../../../admin/auth/utils/checkIsAdmin'
 
 const catSchema = Joi.object({
 	ru: Joi.string().min(1).required().messages({
@@ -18,8 +19,9 @@ const catSchema = Joi.object({
 	})
 })
 
-export async function POST(req: NextRequest) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const id = Number((await params).id)
 		const formData = await req.formData()
 		const body = Object.fromEntries(formData)
 
@@ -34,11 +36,6 @@ export async function POST(req: NextRequest) {
 		}
 
 		value.slug = slugify(name.uk)
-		const existingCategory = await prisma.category.findUnique({ where: { slug: value.slug } })
-
-		if (existingCategory) {
-			throw new ApiError(`Така категорія вже існує`, 400)
-		}
 
 		const isAdmin = await checkIsAdmin(req)
 
@@ -46,19 +43,25 @@ export async function POST(req: NextRequest) {
 
 		let savedImage: string
 
-		if (image && image.type?.startsWith('image/')) {
-			const savedPath = await saveFile(image, req)
-			savedImage = savedPath
+		const oldCategory = await prisma.firstLevelCategory.findUnique({ where: { id } })
+
+		if (image) {
+			console.log(oldCategory?.image)
+			if (oldCategory?.image) await deleteFile(oldCategory.image, req)
+
+			if (image && image.type?.startsWith('image/')) {
+				const savedPath = await saveFile(image, req)
+				savedImage = savedPath
+			} else {
+				throw new ApiError('Each image must be of type image/*', 400)
+			}
 		} else {
-			throw new ApiError('Each image must be of type image/*', 400)
+			savedImage = oldCategory?.image ?? ''
 		}
 
-		const cat = await prisma.category.create({
-			data: {
-				slug: value.slug,
-				name,
-				image: savedImage
-			}
+		const cat = await prisma.firstLevelCategory.update({
+			where: { id },
+			data: { image: savedImage, name }
 		})
 
 		return NextResponse.json(

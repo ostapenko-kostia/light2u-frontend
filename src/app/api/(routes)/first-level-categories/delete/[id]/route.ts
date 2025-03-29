@@ -16,7 +16,7 @@ export async function DELETE(
 		const isAdmin = await checkIsAdmin(req)
 		if (!isAdmin) throw new ApiError('You are not admin', 403)
 
-		await prisma.category.delete({ where: { id } })
+		await prisma.firstLevelCategory.delete({ where: { id } })
 		return NextResponse.json({ ok: true }, { status: 200 })
 	} catch (error) {
 		return handleApiError(error)

@@ -9,57 +9,37 @@ import { checkIsAdmin } from '../../admin/auth/utils/checkIsAdmin'
 
 const productSchema = Joi.object({
 	name: Joi.string().min(1).required().messages({
-		'string.empty': 'Name is required',
-		'any.required': 'Name is required'
+		'string.empty': "Назва обов'язкова до заповнення",
+		'any.required': "Назва обов'язкова до заповнення"
 	}),
 	price: Joi.number().integer().positive().required().messages({
-		'number.base': 'Price must be a number',
-		'number.integer': 'Price must be an integer',
-		'number.positive': 'Price must be greater than zero',
-		'any.required': 'Price is required'
+		'number.base': "Ціна обов'язкова до заповнення",
+		'number.integer': "Ціна обов'язкова до заповнення",
+		'number.positive': "Ціна обов'язкова до заповнення",
+		'any.required': "Ціна обов'язкова до заповнення"
 	}),
 	description: Joi.string().min(1).required().messages({
-		'string.empty': 'Description is required',
-		'any.required': 'Description is required'
+		'string.empty': "Опис обов'язковий до заповнення",
+		'any.required': "Опис обов'язковий до заповнення"
 	}),
 	categorySlug: Joi.string().min(1).required().messages({
-		'string.empty': 'Category slug is required',
-		'any.required': 'Category slug is required'
+		'string.empty': "Категорія обов'язкова до заповнення",
+		'any.required': "Категорія обов'язкова до заповнення"
 	}),
-	materials: Joi.string().required().messages({
-		'string.empty': 'Materials are required',
-		'any.required': 'Materials are required'
-	}),
-	dimensions: Joi.string().required().messages({
-		'string.empty': 'Dimensions are required',
-		'any.required': 'Dimensions are required'
-	}),
-	weight: Joi.string().required().messages({
-		'string.empty': 'Weight is required',
-		'any.required': 'Weight is required'
-	}),
-	power: Joi.string().required().messages({
-		'string.empty': 'Power is required',
-		'any.required': 'Power is required'
-	}),
-	voltage: Joi.number().integer().positive().required().messages({
-		'number.base': 'Voltage must be a number',
-		'number.integer': 'Voltage must be an integer',
-		'number.positive': 'Voltage must be greater than zero',
-		'any.required': 'Voltage is required'
-	}),
-	bulb: Joi.string().required().messages({
-		'string.empty': 'Bulb information is required',
-		'any.required': 'Bulb information is required'
-	}),
-	bulbColor: Joi.string().required().messages({
-		'string.empty': 'Bulb color is required',
-		'any.required': 'Bulb color is required'
-	}),
-	bulbType: Joi.string().required().messages({
-		'string.empty': 'Bulb type is required',
-		'any.required': 'Bulb type is required'
-	}),
+	productInfo: Joi.array()
+		.items(
+			Joi.object({
+				key: Joi.string().min(1).required().messages({
+					'string.empty': "Ключ обов'язковий до заповнення",
+					'any.required': "Ключ обов'язковий до заповнення"
+				}),
+				value: Joi.string().min(1).required().messages({
+					'string.empty': "Значення обов'язкове до заповнення",
+					'any.required': "Значення обов'язкове до заповнення"
+				})
+			})
+		)
+		.optional(),
 	locale: Joi.string().valid('uk', 'ru').default('uk').messages({
 		'string.empty': 'Locale is required',
 		'any.only': 'Locale must be either "uk" or "ru"'
@@ -113,6 +93,8 @@ export async function POST(req: NextRequest) {
 			}
 		}
 
+		const info = productInfo.productInfo
+
 		const product = await prisma.product.create({
 			data: {
 				name: value.name,
@@ -120,16 +102,14 @@ export async function POST(req: NextRequest) {
 				price: value.price,
 				description: value.description,
 				categorySlug: value.categorySlug,
-				materials: value.materials,
-				dimensions: value.dimensions,
-				weight: value.weight,
-				power: value.power,
-				voltage: value.voltage,
-				bulb: value.bulb,
-				bulbColor: value.bulbColor,
-				bulbType: value.bulbType,
 				locale: value.locale || 'uk',
-				images: savedImages
+				images: savedImages,
+				info: info?.length > 0 ? {
+					create: info?.map((info: any) => ({
+						key: info.key,
+						value: info.value
+					}))
+				} : undefined
 			}
 		})
 
