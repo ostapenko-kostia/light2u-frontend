@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 export const tokenService = {
 	generateAdminAccessToken(payload: object) {
 		const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET as string, {
-			expiresIn: '30m'
+			expiresIn: '1d'
 		})
 
 		return { accessToken }
