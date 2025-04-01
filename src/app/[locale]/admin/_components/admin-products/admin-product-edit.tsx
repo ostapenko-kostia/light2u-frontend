@@ -1,6 +1,7 @@
 'use client'
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { FileInput } from '@/components/ui/file-input'
 import { useUpdateProduct } from '@/hooks/useProducts'
 import { Product, ProductInfo, SecondLevelCategory } from '@prisma/client'
 import { useQueryClient } from '@tanstack/react-query'
@@ -47,7 +48,13 @@ export function AdminProductEdit({ categories, product }: Props) {
 		data.locale = product.locale
 		await editFunc({
 			id: product.id,
-			data
+			data: {
+				...data,
+				productInfo:
+					typeof data.productInfo === 'string'
+						? JSON.parse(data.productInfo)
+						: data.productInfo.filter(info => info.key && info.value)
+			}
 		})
 	}
 
@@ -95,13 +102,15 @@ export function AdminProductEdit({ categories, product }: Props) {
 				onSubmit={handleSubmit(data => edit(data))}
 			>
 				<div className='flex flex-col gap-2'>
-					<label htmlFor='images'>Зображення</label>
-					<input
-						type='file'
-						multiple
+					<label>Зображення</label>
+					<FileInput
+						multiple={true}
 						accept='image/*'
-						{...register('images')}
-						className='border border-gray-200 rounded-md p-2'
+						onChange={files => {
+							if (files) {
+								setValue('images', files)
+							}
+						}}
 					/>
 				</div>
 
@@ -148,17 +157,6 @@ export function AdminProductEdit({ categories, product }: Props) {
 					</select>
 				</div>
 
-				<div className='flex flex-col gap-2'>
-					<label htmlFor='description'>Опис</label>
-					<textarea
-						id='description'
-						defaultValue={product.description}
-						placeholder='Опишіть товар детально...'
-						className='border border-gray-200 rounded-md p-2'
-						{...register('description')}
-					/>
-				</div>
-
 				<div className='flex flex-col gap-4'>
 					<div className='flex items-center justify-between'>
 						<label>Додаткова інформація</label>
@@ -202,6 +200,17 @@ export function AdminProductEdit({ categories, product }: Props) {
 							</button>
 						</div>
 					))}
+				</div>
+
+				<div className='flex flex-col gap-2'>
+					<label htmlFor='description'>Опис</label>
+					<textarea
+						id='description'
+						defaultValue={product.description}
+						placeholder='Опишіть товар детально...'
+						className='border border-gray-200 rounded-md p-2'
+						{...register('description')}
+					/>
 				</div>
 
 				<button

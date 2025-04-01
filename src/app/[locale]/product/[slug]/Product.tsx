@@ -32,12 +32,12 @@ export function Product({ product }: { product: ProductWithInfo }) {
 			<h3 className='text-2xl font-medium mt-8 text-[#121212BB] max-[500px]:!text-xl'>
 				{t('product-info-title')}
 			</h3>
-			<ul className='flex flex-col gap-2 items-start text-start max-[500px]:!text-sm'>
+			<ul className='flex flex-col gap-4 items-start text-start justify-start max-[500px]:!text-sm'>
 				{product.info &&
 					product.info.map(i => (
 						<li
 							key={i.key}
-							className='flex items-center gap-2'
+							className='flex items-start justify-start gap-2'
 						>
 							<span className='font-medium text-[#121212BF]'>{i.key}:</span>
 							<span className='font-light'>{i.value}</span>

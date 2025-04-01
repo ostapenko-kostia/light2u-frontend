@@ -101,9 +101,9 @@ export async function PUT(
 		}
 
 		const { info: _, ...valueWithoutInfo } = value
-		const { productInfoFromValue, ...valueWithoutProductInfo } = valueWithoutInfo
+		const { productInfo: productInfoFromValue, ...valueWithoutProductInfo } = valueWithoutInfo
 
-		if (valueWithoutInfo) {
+		if (valueWithoutProductInfo) {
 			await prisma.product.update({
 				where: { id: Number(productId) },
 				data: valueWithoutProductInfo

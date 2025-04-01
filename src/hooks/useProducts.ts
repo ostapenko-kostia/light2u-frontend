@@ -74,15 +74,9 @@ export const useUpdateProduct = () => {
 					formData.append('images', el)
 				})
 			}
-			const dataForForm = Object.entries(data).reduce((acc, [key, value]) => {
-				if (key !== 'images') {
-					acc[key] = typeof value === 'object' ? JSON.stringify(value) : String(value)
-				}
-				if (!value && key !== 'isNew') delete acc[key]
-				return acc
-			}, {} as Record<string, string>)
 
-			formData.append('productInfo', JSON.stringify(dataForForm))
+			const { images, ...dataWithoutImages } = data
+			formData.append('productInfo', JSON.stringify(dataWithoutImages))
 
 			const res = await productsService.updateProduct(id, formData)
 			if (!res?.data) return Promise.reject()

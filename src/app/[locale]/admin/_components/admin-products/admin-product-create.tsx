@@ -131,16 +131,6 @@ export function AdminProductCreate({ category, locale }: Props) {
 					/>
 				</div>
 
-				<div className='flex flex-col gap-2'>
-					<Label htmlFor='description'>Опис</Label>
-					<Textarea
-						id='description'
-						placeholder='Опишіть товар детально...'
-						className='border-gray-200'
-						{...register('description')}
-					/>
-				</div>
-
 				<div className='flex flex-col gap-4'>
 					<div className='flex items-center justify-between'>
 						<Label>Додаткова інформація</Label>
@@ -182,6 +172,16 @@ export function AdminProductCreate({ category, locale }: Props) {
 							</button>
 						</div>
 					))}
+				</div>
+
+				<div className='flex flex-col gap-2'>
+					<Label htmlFor='description'>Опис</Label>
+					<Textarea
+						id='description'
+						placeholder='Опишіть товар детально...'
+						className='border-gray-200'
+						{...register('description')}
+					/>
 				</div>
 
 				<button
