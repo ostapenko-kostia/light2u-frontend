@@ -23,6 +23,12 @@ const productSchema = Joi.object({
 				value: Joi.string().min(1).required().messages({
 					'string.empty': "Значення обов'язкове до заповнення",
 					'any.required': "Значення обов'язкове до заповнення"
+				}),
+				order: Joi.number().integer().min(0).required().messages({
+					'number.base': 'Порядок має бути числом',
+					'number.integer': 'Порядок має бути цілим числом',
+					'number.min': "Порядок не може бути від'ємним",
+					'any.required': "Порядок обов'язковий"
 				})
 			})
 		)
@@ -114,9 +120,9 @@ export async function PUT(
 			await prisma.productInfo.deleteMany({
 				where: { productId: Number(productId) }
 			})
-			
+
 			await prisma.productInfo.createMany({
-				data: productInfoFromValue.map((info: any) => ({
+				data: productInfoFromValue.map((info: any, index: number) => ({
 					productId: Number(productId),
 					...info
 				}))

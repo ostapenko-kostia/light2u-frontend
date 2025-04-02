@@ -5,7 +5,7 @@ import { FileInput } from '@/components/ui/file-input'
 import { useUpdateProduct } from '@/hooks/useProducts'
 import { Product, ProductInfo, SecondLevelCategory } from '@prisma/client'
 import { useQueryClient } from '@tanstack/react-query'
-import { EditIcon, PlusIcon, Trash2Icon } from 'lucide-react'
+import { ArrowDownIcon, ArrowUpIcon, EditIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -36,7 +36,7 @@ export function AdminProductEdit({ categories, product }: Props) {
 			}))
 		}
 	})
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control,
 		name: 'productInfo'
 	})
@@ -53,7 +53,12 @@ export function AdminProductEdit({ categories, product }: Props) {
 				productInfo:
 					typeof data.productInfo === 'string'
 						? JSON.parse(data.productInfo)
-						: data.productInfo.filter(info => info.key && info.value)
+						: data.productInfo
+								.filter(info => info.key && info.value)
+								.map((info, index) => ({
+									...info,
+									order: index
+								}))
 			}
 		})
 	}
@@ -85,6 +90,18 @@ export function AdminProductEdit({ categories, product }: Props) {
 	const removeProductInfo = (index: number) => {
 		if (fields.length > 1) {
 			remove(index)
+		}
+	}
+
+	const moveUp = (index: number) => {
+		if (index > 0) {
+			move(index, index - 1)
+		}
+	}
+
+	const moveDown = (index: number) => {
+		if (index < fields.length - 1) {
+			move(index, index + 1)
 		}
 	}
 
@@ -169,37 +186,57 @@ export function AdminProductEdit({ categories, product }: Props) {
 							Додати поле
 						</button>
 					</div>
-					{fields.map((field, index) => (
-						<div
-							key={field.id}
-							className='flex items-center gap-4'
-						>
-							<div className='flex-1'>
-								<input
-									placeholder='Назва поля'
-									className='border border-gray-200 rounded-md p-2 w-full'
-									defaultValue={field.key}
-									{...register(`productInfo.${index}.key`)}
-								/>
-							</div>
-							<div className='flex-1'>
-								<input
-									placeholder='Значення'
-									className='border border-gray-200 rounded-md p-2 w-full'
-									defaultValue={field.value}
-									{...register(`productInfo.${index}.value`)}
-								/>
-							</div>
-							<button
-								type='button'
-								onClick={() => removeProductInfo(index)}
-								className='text-red-600 hover:text-red-800'
-								disabled={fields.length === 1}
+					<div className='space-y-4'>
+						{fields.map((field, index) => (
+							<div
+								key={field.id}
+								className='flex items-center gap-4'
 							>
-								<Trash2Icon size={20} />
-							</button>
-						</div>
-					))}
+								<div className='flex flex-col gap-1'>
+									<button
+										type='button'
+										onClick={() => moveUp(index)}
+										disabled={index === 0}
+										className='text-gray-400 hover:text-gray-600 disabled:opacity-50'
+									>
+										<ArrowUpIcon size={20} />
+									</button>
+									<button
+										type='button'
+										onClick={() => moveDown(index)}
+										disabled={index === fields.length - 1}
+										className='text-gray-400 hover:text-gray-600 disabled:opacity-50'
+									>
+										<ArrowDownIcon size={20} />
+									</button>
+								</div>
+								<div className='flex-1'>
+									<input
+										placeholder='Назва поля'
+										className='border border-gray-200 rounded-md p-2 w-full'
+										defaultValue={field.key}
+										{...register(`productInfo.${index}.key`)}
+									/>
+								</div>
+								<div className='flex-1'>
+									<input
+										placeholder='Значення'
+										className='border border-gray-200 rounded-md p-2 w-full'
+										defaultValue={field.value}
+										{...register(`productInfo.${index}.value`)}
+									/>
+								</div>
+								<button
+									type='button'
+									onClick={() => removeProductInfo(index)}
+									className='text-red-600 hover:text-red-800'
+									disabled={fields.length === 1}
+								>
+									<Trash2Icon size={20} />
+								</button>
+							</div>
+						))}
+					</div>
 				</div>
 
 				<div className='flex flex-col gap-2'>

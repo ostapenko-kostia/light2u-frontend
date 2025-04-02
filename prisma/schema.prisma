@@ -19,7 +19,7 @@ model Product {
   locale String @default("uk")
 
   info         ProductInfo[]
-  category     SecondLevelCategory      @relation(fields: [categorySlug], references: [slug])
+  category     SecondLevelCategory @relation(fields: [categorySlug], references: [slug])
   categorySlug String
 
   createdAt DateTime @default(now())
@@ -31,6 +31,7 @@ model ProductInfo {
 
   key   String
   value String
+  order Int    @default(0)
 
   product   Product @relation(references: [id], fields: [productId])
   productId Int

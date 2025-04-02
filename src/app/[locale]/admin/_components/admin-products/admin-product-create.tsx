@@ -4,12 +4,11 @@ import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateProduct } from '@/hooks/useProducts'
 import { SecondLevelCategory } from '@prisma/client'
 import { useQueryClient } from '@tanstack/react-query'
-import { PlusCircleIcon, PlusIcon, Trash2Icon } from 'lucide-react'
+import { ArrowDownIcon, ArrowUpIcon, PlusCircleIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -36,23 +35,24 @@ interface Props {
 
 export function AdminProductCreate({ category, locale }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
+	const queryClient = useQueryClient()
 	const { register, handleSubmit, setValue, control } = useForm<Form>({
 		defaultValues: {
-			productInfo: [{ key: '', value: '' }]
+			productInfo: []
 		}
 	})
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, move } = useFieldArray({
 		control,
 		name: 'productInfo'
 	})
-	const queryClient = useQueryClient()
 	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useCreateProduct()
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
 
 	useEffect(() => {
 		setValue('locale', locale)
-	}, [locale, setValue])
+		setValue('categorySlug', category!.slug)
+	}, [locale, category, setValue])
 
 	useEffect(() => {
 		if (isPending) {
@@ -70,6 +70,18 @@ export function AdminProductCreate({ category, locale }: Props) {
 		}
 	}, [isPending, isSuccess, isError])
 
+	const create = async (data: Form) => {
+		await createFunc({
+			...data,
+			productInfo: data.productInfo
+				.filter(info => info.key && info.value)
+				.map((info, index) => ({
+					...info,
+					order: index
+				}))
+		})
+	}
+
 	const addProductInfo = () => {
 		append({ key: '', value: '' })
 	}
@@ -80,22 +92,33 @@ export function AdminProductCreate({ category, locale }: Props) {
 		}
 	}
 
+	const moveUp = (index: number) => {
+		if (index > 0) {
+			move(index, index - 1)
+		}
+	}
+
+	const moveDown = (index: number) => {
+		if (index < fields.length - 1) {
+			move(index, index + 1)
+		}
+	}
+
 	return (
 		<Dialog
 			title='Створити товар'
 			trigger={
-				<button className='w-full h-full min-h-56 bg-[rgba(0,0,0,.35)] hover:bg-[rgba(0,0,0,.6)] transition-colors duration-700 rounded-md flex flex-col gap-4 items-center justify-center'>
+				<button className='min-h-52 w-full h-full flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg hover:border-gray-300'>
 					<PlusCircleIcon
-						size={90}
-						stroke='#fff'
+						size={24}
+						className='text-gray-400'
 					/>
-					<h3 className='text-white text-2xl font-medium'>Створити</h3>
 				</button>
 			}
 		>
 			<form
 				className='mx-auto bg-white rounded-md px-4 h-min flex flex-col gap-4 w-[90%]'
-				onSubmit={handleSubmit(data => createFunc({ ...data, categorySlug: category?.slug || '' }))}
+				onSubmit={handleSubmit(data => create(data))}
 			>
 				<div className='flex flex-col gap-2'>
 					<FileInput
@@ -143,35 +166,55 @@ export function AdminProductCreate({ category, locale }: Props) {
 							Додати поле
 						</button>
 					</div>
-					{fields.map((field, index) => (
-						<div
-							key={field.id}
-							className='flex items-center gap-4'
-						>
-							<div className='flex-1'>
-								<Input
-									placeholder='Назва поля'
-									className='border-gray-200'
-									{...register(`productInfo.${index}.key`)}
-								/>
-							</div>
-							<div className='flex-1'>
-								<Input
-									placeholder='Значення'
-									className='border-gray-200'
-									{...register(`productInfo.${index}.value`)}
-								/>
-							</div>
-							<button
-								type='button'
-								onClick={() => removeProductInfo(index)}
-								className='text-red-600 hover:text-red-800'
-								disabled={fields.length === 1}
+					<div className='space-y-4'>
+						{fields.map((field, index) => (
+							<div
+								key={field.id}
+								className='flex items-center gap-4'
 							>
-								<Trash2Icon size={20} />
-							</button>
-						</div>
-					))}
+								<div className='flex flex-col gap-1'>
+									<button
+										type='button'
+										onClick={() => moveUp(index)}
+										disabled={index === 0}
+										className='text-gray-400 hover:text-gray-600 disabled:opacity-50'
+									>
+										<ArrowUpIcon size={20} />
+									</button>
+									<button
+										type='button'
+										onClick={() => moveDown(index)}
+										disabled={index === fields.length - 1}
+										className='text-gray-400 hover:text-gray-600 disabled:opacity-50'
+									>
+										<ArrowDownIcon size={20} />
+									</button>
+								</div>
+								<div className='flex-1'>
+									<Input
+										placeholder='Назва поля'
+										className='border-gray-200'
+										{...register(`productInfo.${index}.key`)}
+									/>
+								</div>
+								<div className='flex-1'>
+									<Input
+										placeholder='Значення'
+										className='border-gray-200'
+										{...register(`productInfo.${index}.value`)}
+									/>
+								</div>
+								<button
+									type='button'
+									onClick={() => removeProductInfo(index)}
+									className='text-red-600 hover:text-red-800'
+									disabled={fields.length === 1}
+								>
+									<Trash2Icon size={20} />
+								</button>
+							</div>
+						))}
+					</div>
 				</div>
 
 				<div className='flex flex-col gap-2'>

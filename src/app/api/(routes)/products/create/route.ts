@@ -8,21 +8,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkIsAdmin } from '../../admin/auth/utils/checkIsAdmin'
 
 const productSchema = Joi.object({
-	name: Joi.string().min(1).required().messages({
+	name: Joi.string().required().messages({
 		'string.empty': "Назва обов'язкова до заповнення",
 		'any.required': "Назва обов'язкова до заповнення"
 	}),
 	price: Joi.number().integer().positive().required().messages({
-		'number.base': "Ціна обов'язкова до заповнення",
-		'number.integer': "Ціна обов'язкова до заповнення",
-		'number.positive': "Ціна обов'язкова до заповнення",
+		'number.base': 'Ціна має бути числом',
+		'number.integer': 'Ціна має бути цілим числом',
+		'number.positive': 'Ціна має бути додатнім числом',
 		'any.required': "Ціна обов'язкова до заповнення"
 	}),
-	description: Joi.string().min(1).required().messages({
+	description: Joi.string().required().messages({
 		'string.empty': "Опис обов'язковий до заповнення",
 		'any.required': "Опис обов'язковий до заповнення"
 	}),
-	categorySlug: Joi.string().min(1).required().messages({
+	categorySlug: Joi.string().required().messages({
 		'string.empty': "Категорія обов'язкова до заповнення",
 		'any.required': "Категорія обов'язкова до заповнення"
 	}),
@@ -36,6 +36,12 @@ const productSchema = Joi.object({
 				value: Joi.string().min(1).required().messages({
 					'string.empty': "Значення обов'язкове до заповнення",
 					'any.required': "Значення обов'язкове до заповнення"
+				}),
+				order: Joi.number().integer().min(0).required().messages({
+					'number.base': 'Порядок має бути числом',
+					'number.integer': 'Порядок має бути цілим числом',
+					'number.min': "Порядок не може бути від'ємним",
+					'any.required': "Порядок обов'язковий"
 				})
 			})
 		)
@@ -104,12 +110,15 @@ export async function POST(req: NextRequest) {
 				categorySlug: value.categorySlug,
 				locale: value.locale || 'uk',
 				images: savedImages,
-				info: info?.length > 0 ? {
-					create: info?.map((info: any) => ({
-						key: info.key,
-						value: info.value
-					}))
-				} : undefined
+				info:
+					info?.length > 0
+						? {
+								create: info?.map((info: any) => ({
+									key: info.key,
+									value: info.value
+								}))
+						  }
+						: undefined
 			}
 		})
 
