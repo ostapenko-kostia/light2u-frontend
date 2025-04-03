@@ -8,7 +8,6 @@ import { AdminProductCreate } from './admin-product-create'
 import { AdminProductDelete } from './admin-product-delete'
 import { AdminProductDuplicate } from './admin-product-duplicate'
 import { AdminProductEdit } from './admin-product-edit'
-import { AdminProductInfo } from './admin-product-info'
 
 type ProductWithInfo = Product & {
 	info: ProductInfo[]
@@ -126,10 +125,6 @@ export function AdminProductsTab({ products, firstLevelCategories, secondLevelCa
 															key={product.id}
 														>
 															<div className='absolute w-1/2 z-10 flex items-center justify-around max-[500px]:gap-4 max-[500px]:justify-between p-0 right-0 bottom-0 rounded-md'>
-																<AdminProductInfo
-																	product={product}
-																	categoryName={(secondCategory.name as { uk: string }).uk}
-																/>
 																<AdminProductEdit
 																	product={product}
 																	categories={secondCategories}
