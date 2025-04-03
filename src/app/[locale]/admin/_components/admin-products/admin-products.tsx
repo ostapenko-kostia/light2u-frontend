@@ -6,6 +6,7 @@ import { ChevronDownIcon, ChevronRightIcon } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { AdminProductCreate } from './admin-product-create'
 import { AdminProductDelete } from './admin-product-delete'
+import { AdminProductDuplicate } from './admin-product-duplicate'
 import { AdminProductEdit } from './admin-product-edit'
 import { AdminProductInfo } from './admin-product-info'
 
@@ -132,6 +133,10 @@ export function AdminProductsTab({ products, firstLevelCategories, secondLevelCa
 																<AdminProductEdit
 																	product={product}
 																	categories={secondCategories}
+																/>
+																<AdminProductDuplicate
+																	productId={product.id}
+																	productName={product.name}
 																/>
 																<AdminProductDelete
 																	productId={product.id}

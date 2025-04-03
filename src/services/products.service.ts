@@ -29,6 +29,10 @@ class ProductsService {
 			headers: { 'Content-Type': 'multipart/form-data' }
 		})
 	}
+
+	async duplicateProduct(id: number) {
+		return await api.post(`/products/duplicate/${id}`)
+	}
 }
 
 export const productsService = new ProductsService()

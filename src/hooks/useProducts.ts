@@ -35,7 +35,6 @@ export const useGetProducts = () => {
 
 export const useDeleteProduct = () => {
 	return useMutation({
-		mutationKey: ['product delete'],
 		mutationFn: async ({ id }: { id: number }) => {
 			const res = await productsService.deleteProduct(id)
 			if (!res?.data) return Promise.reject()
@@ -46,7 +45,6 @@ export const useDeleteProduct = () => {
 
 export const useCreateProduct = () => {
 	return useMutation({
-		mutationKey: ['product create'],
 		mutationFn: async (data: BaseProductData) => {
 			const formData = new FormData()
 
@@ -65,7 +63,6 @@ export const useCreateProduct = () => {
 
 export const useUpdateProduct = () => {
 	return useMutation({
-		mutationKey: ['product edit'],
 		mutationFn: async ({ id, data }: { id: number; data: Partial<BaseProductData> }) => {
 			const formData = new FormData()
 
@@ -79,6 +76,16 @@ export const useUpdateProduct = () => {
 			formData.append('productInfo', JSON.stringify(dataWithoutImages))
 
 			const res = await productsService.updateProduct(id, formData)
+			if (!res?.data) return Promise.reject()
+			return res
+		}
+	})
+}
+
+export const useDuplicateProduct = () => {
+	return useMutation({
+		mutationFn: async ({ id }: { id: number }) => {
+			const res = await productsService.duplicateProduct(id)
 			if (!res?.data) return Promise.reject()
 			return res
 		}
