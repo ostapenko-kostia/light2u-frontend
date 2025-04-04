@@ -1,5 +1,6 @@
 import { Label } from '@/components/ui/label'
-import { UploadIcon, XIcon } from 'lucide-react'
+import { GripVertical, UploadIcon, XIcon } from 'lucide-react'
+import Image from 'next/image'
 import { ChangeEvent, useRef, useState } from 'react'
 
 interface FileInputProps {
@@ -13,6 +14,8 @@ interface FileInputProps {
 export function FileInput({ onChange, multiple, accept, label, className }: FileInputProps) {
 	const [dragActive, setDragActive] = useState(false)
 	const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+	const [draggedFileIndex, setDraggedFileIndex] = useState<number | null>(null)
+	const [previewUrls, setPreviewUrls] = useState<string[]>([])
 	const inputRef = useRef<HTMLInputElement>(null)
 
 	const handleDrag = (e: React.DragEvent) => {
@@ -42,30 +45,56 @@ export function FileInput({ onChange, multiple, accept, label, className }: File
 		}
 	}
 
-	const handleFiles = (files: FileList) => {
+	const handleFiles = async (files: FileList) => {
 		if (multiple) {
 			const newFiles = Array.from(files)
-			setSelectedFiles(prev => [...prev, ...newFiles])
+			setSelectedFiles(newFiles)
+
+			// Create preview URLs for images
+			const urls = await Promise.all(
+				newFiles.map(file => {
+					if (file.type.startsWith('image/')) {
+						return URL.createObjectURL(file)
+					}
+					return ''
+				})
+			)
+			setPreviewUrls(urls)
+
 			onChange(files)
 		} else {
 			setSelectedFiles([files[0]])
+
+			// Create preview URL for single image
+			if (files[0].type.startsWith('image/')) {
+				setPreviewUrls([URL.createObjectURL(files[0])])
+			} else {
+				setPreviewUrls([''])
+			}
+
 			onChange(files)
 		}
 	}
 
 	const removeFile = (index: number) => {
+		// Revoke the preview URL if it's an image
+		if (previewUrls[index]) {
+			URL.revokeObjectURL(previewUrls[index])
+		}
+
 		setSelectedFiles(prev => {
 			const newFiles = prev.filter((_, i) => i !== index)
 			if (newFiles.length === 0) {
 				onChange(null)
 			} else {
-				// Create a new FileList-like object
 				const dataTransfer = new DataTransfer()
 				newFiles.forEach(file => dataTransfer.items.add(file))
 				onChange(dataTransfer.files)
 			}
 			return newFiles
 		})
+
+		setPreviewUrls(prev => prev.filter((_, i) => i !== index))
 	}
 
 	const formatFileSize = (bytes: number) => {
@@ -74,6 +103,32 @@ export function FileInput({ onChange, multiple, accept, label, className }: File
 		const sizes = ['Bytes', 'KB', 'MB', 'GB']
 		const i = Math.floor(Math.log(bytes) / Math.log(k))
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+	}
+
+	const handleDragStart = (index: number) => {
+		setDraggedFileIndex(index)
+	}
+
+	const handleDragOver = (e: React.DragEvent, index: number) => {
+		e.preventDefault()
+		if (draggedFileIndex === null) return
+
+		if (draggedFileIndex !== index) {
+			const newFiles = [...selectedFiles]
+			const [draggedFile] = newFiles.splice(draggedFileIndex, 1)
+			newFiles.splice(index, 0, draggedFile)
+			setSelectedFiles(newFiles)
+			setDraggedFileIndex(index)
+
+			// Create a new FileList-like object
+			const dataTransfer = new DataTransfer()
+			newFiles.forEach(file => dataTransfer.items.add(file))
+			onChange(dataTransfer.files)
+		}
+	}
+
+	const handleDragEnd = () => {
+		setDraggedFileIndex(null)
 	}
 
 	return (
@@ -117,11 +172,32 @@ export function FileInput({ onChange, multiple, accept, label, className }: File
 					{selectedFiles.map((file, index) => (
 						<div
 							key={index}
-							className='flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-200'
+							className={`flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-200 ${
+								draggedFileIndex === index ? 'opacity-50' : ''
+							}`}
+							draggable
+							onDragStart={() => handleDragStart(index)}
+							onDragOver={e => handleDragOver(e, index)}
+							onDragEnd={handleDragEnd}
 						>
 							<div className='flex items-center gap-2'>
-								<span className='text-sm text-gray-700 truncate max-w-[200px]'>{file.name}</span>
-								<span className='text-xs text-gray-500'>({formatFileSize(file.size)})</span>
+								<GripVertical className='w-4 h-4 text-gray-400 cursor-move' />
+								{previewUrls[index] && file.type.startsWith('image/') ? (
+									<div className='relative w-12 h-12'>
+										<Image
+											src={previewUrls[index]}
+											alt={file.name}
+											fill
+											className='object-cover rounded-md'
+											sizes='(max-width: 48px) 100vw, 48px'
+											quality={100}
+										/>
+									</div>
+								) : null}
+								<div className='flex flex-col'>
+									<span className='text-sm text-gray-700 truncate max-w-[200px]'>{file.name}</span>
+									<span className='text-xs text-gray-500'>({formatFileSize(file.size)})</span>
+								</div>
 							</div>
 							<button
 								type='button'

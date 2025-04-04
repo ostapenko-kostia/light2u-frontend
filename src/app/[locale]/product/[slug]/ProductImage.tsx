@@ -33,14 +33,13 @@ export function ProductImage({ product }: { product: Product }) {
 				>
 					{product.images.map((image, index) => (
 						<SwiperSlide key={image}>
-							<div className='relative aspect-square w-full'>
-								<Image
+							<div className='aspect-square w-full'>
+								<img
 									src={image}
 									alt={`${product.name} - фото ${index + 1}`}
-									fill
-									sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-									className='object-cover rounded-md'
-									priority={index === 0}
+									width={5000}
+									height={5000}
+									className='object-cover rounded-md w-full h-full'
 								/>
 								<button
 									onClick={() => setIsOpen(true)}
