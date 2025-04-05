@@ -104,7 +104,7 @@ function DialogContent({
 						key='dialog-content'
 						id='dialog-content'
 						className={clsx(
-							'overflow-y-scroll scroll-smooth no-scrollbar fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 bg-white z-[1000] w-1/2 max-sm:w-[90vw] max-h-[75vh] h-auto rounded-lg'
+							'overflow-y-scroll scroll-smooth no-scrollbar fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 max-sm:p-3 bg-white z-[1000] w-1/2 max-sm:w-[95%] max-h-[75vh] h-auto rounded-lg'
 						)}
 						variants={sideVariants}
 						initial='hidden'
@@ -112,7 +112,9 @@ function DialogContent({
 						exit='hidden'
 					>
 						<div className='w-full pb-4 flex justify-between items-center'>
-							<h2 className='text-2xl font-light tracking-wider uppercase text-black max-[450px]:text-xl'>{title}</h2>
+							<h2 className='text-2xl font-light tracking-wider uppercase text-black max-[450px]:text-xl'>
+								{title}
+							</h2>
 							<X
 								className='cursor-pointer'
 								onClick={closeDialog}

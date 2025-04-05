@@ -117,7 +117,7 @@ export function AdminProductCreate({ category, locale }: Props) {
 			}
 		>
 			<form
-				className='mx-auto bg-white rounded-md px-4 h-min flex flex-col gap-4 w-[90%]'
+				className='mx-auto bg-white rounded-md h-min flex flex-col gap-4 w-[90%] max-w-[360px] px-2 sm:px-4'
 				onSubmit={handleSubmit(data => create(data))}
 			>
 				<div className='flex flex-col gap-2'>
@@ -155,7 +155,7 @@ export function AdminProductCreate({ category, locale }: Props) {
 				</div>
 
 				<div className='flex flex-col gap-4'>
-					<div className='flex items-center justify-between'>
+					<div className='flex flex-col items-start gap-2'>
 						<Label>Додаткова інформація</Label>
 						<button
 							type='button'
@@ -166,38 +166,46 @@ export function AdminProductCreate({ category, locale }: Props) {
 							Додати поле
 						</button>
 					</div>
-					<div className='space-y-4'>
+					<div className='space-y-2'>
 						{fields.map((field, index) => (
 							<div
 								key={field.id}
-								className='flex items-center gap-4'
+								className='flex flex-col sm:flex-row items-start sm:items-center gap-2 p-2 bg-gray-50 rounded-md border border-gray-200'
 							>
-								<div className='flex flex-col gap-1'>
+								<div className='flex items-center gap-1 w-full sm:w-auto justify-between sm:justify-start'>
+									<div className='flex items-center gap-1'>
+										<button
+											type='button'
+											onClick={() => moveUp(index)}
+											disabled={index === 0}
+											className='p-1 hover:bg-gray-200 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+										>
+											<ArrowUpIcon size={16} />
+										</button>
+										<button
+											type='button'
+											onClick={() => moveDown(index)}
+											disabled={index === fields.length - 1}
+											className='p-1 hover:bg-gray-200 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+										>
+											<ArrowDownIcon size={16} />
+										</button>
+									</div>
 									<button
 										type='button'
-										onClick={() => moveUp(index)}
-										disabled={index === 0}
-										className='text-gray-400 hover:text-gray-600 disabled:opacity-50'
+										onClick={() => removeProductInfo(index)}
+										className='p-1 hover:bg-gray-200 rounded-full transition-colors text-red-600 hover:text-red-800 sm:hidden'
+										disabled={fields.length === 1}
 									>
-										<ArrowUpIcon size={20} />
-									</button>
-									<button
-										type='button'
-										onClick={() => moveDown(index)}
-										disabled={index === fields.length - 1}
-										className='text-gray-400 hover:text-gray-600 disabled:opacity-50'
-									>
-										<ArrowDownIcon size={20} />
+										<Trash2Icon size={16} />
 									</button>
 								</div>
-								<div className='flex-1'>
+								<div className='flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-2'>
 									<Input
 										placeholder='Назва поля'
 										className='border-gray-200'
 										{...register(`productInfo.${index}.key`)}
 									/>
-								</div>
-								<div className='flex-1'>
 									<Input
 										placeholder='Значення'
 										className='border-gray-200'
@@ -207,10 +215,10 @@ export function AdminProductCreate({ category, locale }: Props) {
 								<button
 									type='button'
 									onClick={() => removeProductInfo(index)}
-									className='text-red-600 hover:text-red-800'
+									className='p-1 hover:bg-gray-200 rounded-full transition-colors text-red-600 hover:text-red-800 hidden sm:block'
 									disabled={fields.length === 1}
 								>
-									<Trash2Icon size={20} />
+									<Trash2Icon size={16} />
 								</button>
 							</div>
 						))}

@@ -1,5 +1,5 @@
 import { Label } from '@/components/ui/label'
-import { GripVertical, UploadIcon, XIcon } from 'lucide-react'
+import { ChevronDown, ChevronUp, UploadIcon, XIcon } from 'lucide-react'
 import Image from 'next/image'
 import { ChangeEvent, useRef, useState } from 'react'
 
@@ -14,7 +14,6 @@ interface FileInputProps {
 export function FileInput({ onChange, multiple, accept, label, className }: FileInputProps) {
 	const [dragActive, setDragActive] = useState(false)
 	const [selectedFiles, setSelectedFiles] = useState<File[]>([])
-	const [draggedFileIndex, setDraggedFileIndex] = useState<number | null>(null)
 	const [previewUrls, setPreviewUrls] = useState<string[]>([])
 	const inputRef = useRef<HTMLInputElement>(null)
 
@@ -105,30 +104,35 @@ export function FileInput({ onChange, multiple, accept, label, className }: File
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 	}
 
-	const handleDragStart = (index: number) => {
-		setDraggedFileIndex(index)
-	}
+	const moveFile = (index: number, direction: 'up' | 'down') => {
+		const newFiles = [...selectedFiles]
+		const newPreviewUrls = [...previewUrls]
 
-	const handleDragOver = (e: React.DragEvent, index: number) => {
-		e.preventDefault()
-		if (draggedFileIndex === null) return
-
-		if (draggedFileIndex !== index) {
-			const newFiles = [...selectedFiles]
-			const [draggedFile] = newFiles.splice(draggedFileIndex, 1)
-			newFiles.splice(index, 0, draggedFile)
-			setSelectedFiles(newFiles)
-			setDraggedFileIndex(index)
-
-			// Create a new FileList-like object
-			const dataTransfer = new DataTransfer()
-			newFiles.forEach(file => dataTransfer.items.add(file))
-			onChange(dataTransfer.files)
+		if (direction === 'up' && index > 0) {
+			// Swap with previous file
+			const tempFile = newFiles[index]
+			const tempUrl = newPreviewUrls[index]
+			newFiles[index] = newFiles[index - 1]
+			newPreviewUrls[index] = newPreviewUrls[index - 1]
+			newFiles[index - 1] = tempFile
+			newPreviewUrls[index - 1] = tempUrl
+		} else if (direction === 'down' && index < newFiles.length - 1) {
+			// Swap with next file
+			const tempFile = newFiles[index]
+			const tempUrl = newPreviewUrls[index]
+			newFiles[index] = newFiles[index + 1]
+			newPreviewUrls[index] = newPreviewUrls[index + 1]
+			newFiles[index + 1] = tempFile
+			newPreviewUrls[index + 1] = tempUrl
 		}
-	}
 
-	const handleDragEnd = () => {
-		setDraggedFileIndex(null)
+		setSelectedFiles(newFiles)
+		setPreviewUrls(newPreviewUrls)
+
+		// Create a new FileList-like object
+		const dataTransfer = new DataTransfer()
+		newFiles.forEach(file => dataTransfer.items.add(file))
+		onChange(dataTransfer.files)
 	}
 
 	return (
@@ -172,16 +176,27 @@ export function FileInput({ onChange, multiple, accept, label, className }: File
 					{selectedFiles.map((file, index) => (
 						<div
 							key={index}
-							className={`flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-200 ${
-								draggedFileIndex === index ? 'opacity-50' : ''
-							}`}
-							draggable
-							onDragStart={() => handleDragStart(index)}
-							onDragOver={e => handleDragOver(e, index)}
-							onDragEnd={handleDragEnd}
+							className='flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-200'
 						>
 							<div className='flex items-center gap-2'>
-								<GripVertical className='w-4 h-4 text-gray-400 cursor-move' />
+								<div className='flex flex-col gap-1'>
+									<button
+										type='button'
+										onClick={() => moveFile(index, 'up')}
+										disabled={index === 0}
+										className='p-1 hover:bg-gray-200 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+									>
+										<ChevronUp className='w-4 h-4 text-gray-500' />
+									</button>
+									<button
+										type='button'
+										onClick={() => moveFile(index, 'down')}
+										disabled={index === selectedFiles.length - 1}
+										className='p-1 hover:bg-gray-200 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+									>
+										<ChevronDown className='w-4 h-4 text-gray-500' />
+									</button>
+								</div>
 								{previewUrls[index] && file.type.startsWith('image/') ? (
 									<div className='relative w-12 h-12'>
 										<Image
@@ -195,7 +210,12 @@ export function FileInput({ onChange, multiple, accept, label, className }: File
 									</div>
 								) : null}
 								<div className='flex flex-col'>
-									<span className='text-sm text-gray-700 truncate max-w-[200px]'>{file.name}</span>
+									<span
+										style={{ wordBreak: 'break-word', whiteSpace: 'wrap' }}
+										className='text-sm max-sm:text-xs text-gray-700 truncate max-w-[200px]'
+									>
+										{file.name}
+									</span>
 									<span className='text-xs text-gray-500'>({formatFileSize(file.size)})</span>
 								</div>
 							</div>
