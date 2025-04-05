@@ -98,10 +98,10 @@ export function AdminDeleteCategory({ category, products, secondLevelCategories 
 				</button>
 			}
 		>
-			<div className='flex flex-col items-start gap-6'>
+			<div className='flex flex-col items-start gap-6 w-full'>
 				<p>Ви дійсно хочете видалити категорію {(category.name as { uk: string }).uk}?</p>
 				<button
-					className='bg-gray-800 text-white rounded-md px-6 py-2 hover:bg-gray-700'
+					className='bg-gray-800 text-white self-end rounded-md px-6 py-2 hover:bg-gray-700'
 					onClick={handleDelete}
 				>
 					Так

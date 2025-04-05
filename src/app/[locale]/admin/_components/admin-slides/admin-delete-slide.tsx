@@ -39,12 +39,12 @@ export function AdminDeleteSlide({ id }: Props) {
 				</button>
 			}
 		>
-			<div className='flex items-start gap-4 flex-col'>
+			<div className='flex items-start gap-4 flex-col w-full'>
 				<span className='text-lg'>Ви впевнені, що хочете видалити цей слайд?</span>
 				<div className='flex items-center gap-4 ml-auto'>
 					<button
 						onClick={() => deleteFunc(id)}
-						className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+						className='bg-gray-800 text-white w-min px-12 py-2 self-end rounded-md hover:bg-gray-700'
 					>
 						Так
 					</button>

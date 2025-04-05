@@ -60,7 +60,7 @@ export function AdminSlideCreate({ locale }: Props) {
 			}
 		>
 			<form
-				className='mx-auto bg-white rounded-md p-4 w-[400px] h-min flex flex-col gap-4 max-sm:w-[90%]'
+				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-4'
 				onSubmit={handleSubmit(data => createFunc(data))}
 			>
 				<div>

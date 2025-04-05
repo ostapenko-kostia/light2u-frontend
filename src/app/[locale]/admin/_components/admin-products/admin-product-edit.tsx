@@ -115,7 +115,7 @@ export function AdminProductEdit({ categories, product }: Props) {
 			}
 		>
 			<form
-				className='mx-auto bg-white rounded-md h-min flex flex-col gap-4 w-[90%] max-w-[360px] px-2 sm:px-4'
+				className='bg-white rounded-md h-min w-full flex flex-col gap-4 px-2 sm:px-4'
 				onSubmit={handleSubmit(data => edit(data))}
 			>
 				<div className='flex flex-col gap-2'>

@@ -45,7 +45,7 @@ export function AdminProductDelete({ productName, productId }: Props) {
 				</button>
 			}
 		>
-			<div className='flex items-start gap-4 flex-col'>
+			<div className='w-full flex items-start gap-4 flex-col'>
 				<span className='text-lg'>Ви впевнені, що хочете видалити {productName}?</span>
 				<div className='flex items-center gap-4 ml-auto'>
 					<button

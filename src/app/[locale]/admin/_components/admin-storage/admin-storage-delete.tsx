@@ -40,11 +40,11 @@ export function DeleteFile({ file }: Props) {
 			title='Видалити файл'
 			trigger={<button className='text-red-600 hover:text-red-900 ml-4'>Видалити</button>}
 		>
-			<div className='mx-auto bg-white rounded-md p-4 w-[400px] h-min flex flex-col gap-8 max-sm:w-[90%]'>
+			<div className='bg-white rounded-md w-full h-min flex flex-col gap-8'>
 				<p>Ви дійсно хочете видалити файл {file.title}?</p>
 				<button
 					type='submit'
-					className='bg-gray-800 text-white rounded-md px-6 py-2 hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min self-end rounded-md px-6 py-2 hover:bg-gray-700'
 					onClick={() => deleteFunc(file.title)}
 				>
 					Видалити

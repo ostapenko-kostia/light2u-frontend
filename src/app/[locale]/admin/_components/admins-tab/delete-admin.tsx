@@ -47,11 +47,11 @@ export function DeleteAdmin({ admin, admins }: Props) {
 				</button>
 			}
 		>
-			<div className='flex flex-col items-start gap-6'>
+			<div className='flex flex-col items-start gap-6 w-full'>
 				<span className='text-lg'>Ви впевнені, що хочете видалити {admin.login}?</span>
 				<button
 					type='submit'
-					className='bg-gray-800 text-white rounded-md px-6 py-2 hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min self-end rounded-md px-6 py-2 hover:bg-gray-700'
 					onClick={() => deleteFunc({ id: admin.id })}
 				>
 					Так

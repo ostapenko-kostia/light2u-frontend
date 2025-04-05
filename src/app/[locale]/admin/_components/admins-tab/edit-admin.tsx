@@ -63,7 +63,7 @@ export function EditAdmin({ admin }: Props) {
 			}
 		>
 			<form
-				className='mx-auto bg-white rounded-md p-4 w-[400px] h-min flex flex-col gap-8 max-sm:w-[90%]'
+				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-8'
 				onSubmit={handleSubmit(data => edit(data))}
 			>
 				<div className='flex items-start flex-col gap-3'>

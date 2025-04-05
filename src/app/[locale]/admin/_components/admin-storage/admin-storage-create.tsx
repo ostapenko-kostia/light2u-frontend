@@ -1,6 +1,7 @@
 'use client'
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { FileInput } from '@/components/ui/file-input'
 import { useCreateFile } from '@/hooks/useStorage'
 import { useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
@@ -17,7 +18,7 @@ interface Form {
 export function CreateFile() {
 	const [loadingToastId, setLoadingToastId] = useState('')
 	const queryClient = useQueryClient()
-	const { register, handleSubmit, watch, formState } = useForm<Form>()
+	const { register, handleSubmit, setValue, formState } = useForm<Form>()
 	const { errors } = formState
 
 	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useCreateFile()
@@ -54,26 +55,19 @@ export function CreateFile() {
 			}
 		>
 			<form
-				className='mx-auto bg-white rounded-md p-4 w-[400px] h-min flex flex-col gap-8 max-sm:w-[90%]'
+				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-8'
 				onSubmit={handleSubmit(data => createFunc(data))}
 			>
-				<div className='flex items-start flex-col gap-3'>
-					<label htmlFor='file'>Файл</label>
-					<label className='w-min text-nowrap appearance-none rounded-md border border-[#ccc] bg-white text-[#333] placeholder:text-[#808080] px-7 cursor-pointer py-3 text-sm focus:z-10 focus:bg-indigo-500 focus:outline-none'>
-						Вибрати файл
-						<input
-							className='hidden'
-							type='file'
-							id='file'
-							{...register('file')}
-						/>
-					</label>{' '}
-					{watch('file') && (
-						<div className='flex flex-col gap-2'>
-							<span>{watch('file')[0].name}</span>
-						</div>
-					)}
-				</div>
+				<FileInput
+					label='Файл'
+					multiple={false}
+					accept='image/*'
+					onChange={file => {
+						if (file) {
+							setValue('file', file)
+						}
+					}}
+				/>
 				<div className='flex items-start flex-col gap-3'>
 					<label
 						htmlFor='name'
@@ -103,7 +97,7 @@ export function CreateFile() {
 				</div>
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min px-12 py-2 self-end rounded-md hover:bg-gray-700'
 				>
 					Створити
 				</button>
