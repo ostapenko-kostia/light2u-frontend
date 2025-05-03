@@ -16,7 +16,10 @@ model Product {
   description String
   price       Int
 
-  locale String @default("uk")
+  locale   String @default("uk")
+
+  quantity Int?
+  order    Int @default(autoincrement())
 
   info         ProductInfo[]
   category     SecondLevelCategory @relation(fields: [categorySlug], references: [slug])

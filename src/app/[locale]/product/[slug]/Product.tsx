@@ -23,8 +23,19 @@ export function Product({ product }: { product: ProductWithInfo }) {
 
 			<p className='text-md mt-2 font-light'>{product.description}</p>
 
+			<div className='mt-8'>
+				{product.quantity ? (
+					<div>
+						<span className='text-green-600'>{t('product-in-stock')}</span>{' '}
+						<span>{product.quantity}</span> шт.
+					</div>
+				) : (
+					<span className='text-red-600'>{t('product-out-stock')}</span>
+				)}
+			</div>
+
 			<Link href='/contacts'>
-				<button className='border-black border hover:bg-black hover:text-white transition-colors duration-200 cursor-pointer py-3 rounded-lg mt-8 w-full'>
+				<button className='border-black border hover:bg-black hover:text-white transition-colors duration-200 cursor-pointer py-3 rounded-lg w-full'>
 					{t('product-buy-button')}
 				</button>
 			</Link>

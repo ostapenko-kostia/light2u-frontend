@@ -26,6 +26,7 @@ interface Form {
 	categorySlug: string
 	locale: string
 	productInfo: ProductInfo[]
+	quantity: number
 }
 
 interface Props {
@@ -62,6 +63,7 @@ export function AdminProductCreate({ category, locale }: Props) {
 		if (isSuccess) {
 			loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['products get'] })
+			toast.success('Товар створено успішно')
 			closeDialog?.()
 		}
 		if (isError) {
@@ -151,6 +153,17 @@ export function AdminProductCreate({ category, locale }: Props) {
 						placeholder='Наприклад: 2500'
 						className='border-gray-200'
 						{...register('price', { valueAsNumber: true })}
+					/>
+				</div>
+
+				<div className='flex flex-col gap-2'>
+					<Label htmlFor='quantity'>Кількість на складі</Label>
+					<Input
+						id='quantity'
+						type='number'
+						placeholder='Наприклад: 100'
+						className='border-gray-200'
+						{...register('quantity', { valueAsNumber: true })}
 					/>
 				</div>
 

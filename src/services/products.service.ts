@@ -33,6 +33,14 @@ class ProductsService {
 	async duplicateProduct(id: number) {
 		return await api.post(`/products/duplicate/${id}`)
 	}
+
+	async moveProductUp(id: number) {
+		return await api.put(`/products/move/up/${id}`)
+	}
+
+	async moveProductDown(id: number) {
+		return await api.put(`/products/move/down/${id}`)
+	}
 }
 
 export const productsService = new ProductsService()

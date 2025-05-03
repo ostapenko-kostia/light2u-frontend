@@ -19,6 +19,7 @@ interface BaseProductData {
 	categorySlug: string
 	locale: string
 	productInfo: ProductInfoInput[]
+	quantity: number
 }
 
 export const useGetProducts = () => {
@@ -91,3 +92,24 @@ export const useDuplicateProduct = () => {
 		}
 	})
 }
+
+export const useMoveProductUp = () => {
+	return useMutation({
+		mutationFn: async ({ id }: { id: number }) => {
+			const res = await productsService.moveProductUp(id)
+			if (!res?.data) return Promise.reject()
+			return res
+		}
+	})
+}
+
+export const useMoveProductDown = () => {
+	return useMutation({
+		mutationFn: async ({ id }: { id: number }) => {
+			const res = await productsService.moveProductDown(id)
+			if (!res?.data) return Promise.reject()
+			return res
+		}
+	})
+}
+

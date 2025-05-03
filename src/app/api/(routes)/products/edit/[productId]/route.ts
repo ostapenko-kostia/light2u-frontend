@@ -11,6 +11,8 @@ import { checkIsAdmin } from '../../../admin/auth/utils/checkIsAdmin'
 const productSchema = Joi.object({
 	name: Joi.string().optional(),
 	price: Joi.number().integer().positive().optional(),
+	quantity: Joi.number().integer().min(0).optional(),
+	order: Joi.number().integer().min(0).optional(),
 	description: Joi.string().optional(),
 	categorySlug: Joi.string().optional(),
 	productInfo: Joi.array()

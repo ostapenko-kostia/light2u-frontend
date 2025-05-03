@@ -135,12 +135,14 @@ export default async function CatalogPage({
 						className='grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 max-[400px]:!grid-cols-1 gap-6 w-full mt-12'
 					>
 						{filteredProducts?.length ? (
-							filteredProducts.map(product => (
-								<ProductCard
-									key={product.id}
-									product={product}
-								/>
-							))
+							filteredProducts
+								.sort((a, b) => b.order - a.order)
+								.map(product => (
+									<ProductCard
+										key={product.id}
+										product={product}
+									/>
+								))
 						) : (
 							<p className='text-gray-500'>{t('catalog-no-products')}</p>
 						)}

@@ -49,7 +49,13 @@ const productSchema = Joi.object({
 	locale: Joi.string().valid('uk', 'ru').default('uk').messages({
 		'string.empty': 'Locale is required',
 		'any.only': 'Locale must be either "uk" or "ru"'
-	})
+	}),
+	quantity: Joi.number().integer().min(0).required().messages({
+		'number.base': 'Кількість має бути числом',
+		'number.integer': 'Кількість має бути цілим числом',
+		'number.min': "Кількість не може бути від'ємною",
+		'any.required': "Кількість обов'язкова"
+	}),
 })
 
 async function generateUniqueSlug(slug: string, locale: string = 'uk'): Promise<string> {
@@ -110,6 +116,7 @@ export async function POST(req: NextRequest) {
 				categorySlug: value.categorySlug,
 				locale: value.locale || 'uk',
 				images: savedImages,
+				quantity: value.quantity,
 				info:
 					info?.length > 0
 						? {

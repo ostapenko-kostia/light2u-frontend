@@ -8,6 +8,8 @@ import { AdminProductCreate } from './admin-product-create'
 import { AdminProductDelete } from './admin-product-delete'
 import { AdminProductDuplicate } from './admin-product-duplicate'
 import { AdminProductEdit } from './admin-product-edit'
+import { AdminProductMoveUp } from './admin-product-move-up'
+import { AdminProductMoveDown } from './admin-product-move-down'
 
 type ProductWithInfo = Product & {
 	info: ProductInfo[]
@@ -119,28 +121,32 @@ export function AdminProductsTab({ products, firstLevelCategories, secondLevelCa
 													</span>
 												</div>
 												<div className='grid grid-cols-3 max-md:grid-cols-2 max-sm:!grid-cols-1 gap-4'>
-													{categoryProducts?.map(product => (
-														<div
-															className='relative max-[500px]:pr-0'
-															key={product.id}
-														>
-															<div className='absolute w-1/2 z-10 flex items-center justify-around max-[500px]:gap-4 max-[500px]:justify-between p-0 right-0 bottom-0 rounded-md'>
-																<AdminProductEdit
-																	product={product}
-																	categories={secondCategories}
-																/>
-																<AdminProductDuplicate
-																	productId={product.id}
-																	productName={product.name}
-																/>
-																<AdminProductDelete
-																	productId={product.id}
-																	productName={product.name}
-																/>
+													{categoryProducts
+														?.sort((a, b) => b.order - a.order)
+														.map(product => (
+															<div
+																className='relative max-[500px]:pr-0'
+																key={product.id}
+															>
+																<div className='mt-auto flex items-center justify-around max-[500px]:gap-1 max-[500px]:justify-between p-0 right-0 bottom-0 rounded-md'>
+																	<AdminProductEdit
+																		product={product}
+																		categories={secondCategories}
+																	/>
+																	<AdminProductDuplicate
+																		productId={product.id}
+																		productName={product.name}
+																	/>
+																	<AdminProductMoveUp productId={product.id} />
+																	<AdminProductMoveDown productId={product.id} />
+																	<AdminProductDelete
+																		productId={product.id}
+																		productName={product.name}
+																	/>
+																</div>
+																<ProductCard product={product} />
 															</div>
-															<ProductCard product={product} />
-														</div>
-													))}
+														))}
 													<AdminProductCreate
 														category={secondCategory}
 														locale={currentLocale}
