@@ -24,7 +24,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 			}
 		}
 
-		await prisma.slide.delete({ where: { id } })
+		await prisma.gallery.delete({ where: { id } })
 
 		return NextResponse.json({ ok: true }, { status: 200 })
 	} catch (error) {
