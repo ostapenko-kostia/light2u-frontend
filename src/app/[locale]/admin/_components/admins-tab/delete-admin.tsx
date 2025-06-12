@@ -2,14 +2,14 @@
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { useAdminDelete } from '@/hooks/useAdmin'
-import { Admin } from '@prisma/client'
+import { IAdmin } from '@/typing/interfaces'
 import { useQueryClient } from '@tanstack/react-query'
 import { useContext, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 interface Props {
-	admins: Admin[]
-	admin: Admin
+	admins: IAdmin[]
+	admin: IAdmin
 }
 
 export function DeleteAdmin({ admin, admins }: Props) {

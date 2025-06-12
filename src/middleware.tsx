@@ -1,32 +1,24 @@
 import { match } from '@formatjs/intl-localematcher'
-import { Admin } from '@prisma/client'
-import axios from 'axios'
 import Negotiator from 'negotiator'
 import createMiddleware from 'next-intl/middleware'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { defaultLocale, locales } from './lib/i18n'
+import axios from 'axios'
 import { TOKEN } from './typing/enums'
 
 const protectedRoutes = ['/admin', '/admin/:path*']
 
 function getLocale(request: NextRequest) {
 	const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value
-	if (cookieLocale && locales.includes(cookieLocale)) {
-		return cookieLocale
-	}
+	if (cookieLocale && locales.includes(cookieLocale)) return cookieLocale
 
 	const referer = request.headers.get('referer')
 	if (referer) {
 		try {
-			const refererUrl = new URL(referer)
-			const refererPathParts = refererUrl.pathname.split('/')
-			if (refererPathParts.length > 1) {
-				const locale = refererPathParts[1]
-				if (locales.includes(locale)) {
-					return locale
-				}
-			}
+			const parts = new URL(referer).pathname.split('/')
+			const refLocale = parts[1]
+			if (locales.includes(refLocale)) return refLocale
 		} catch {}
 	}
 
@@ -35,23 +27,19 @@ function getLocale(request: NextRequest) {
 	return match(languages, locales, defaultLocale)
 }
 
-function getLocaleFromPathname(pathname: string) {
-	const segments = pathname.split('/')
-	const firstSegment = segments[1] || ''
-	return locales.includes(firstSegment) ? firstSegment : null
+function getLocaleFromPath(pathname: string) {
+	const first = pathname.split('/')[1]
+	return locales.includes(first) ? first : null
 }
 
-function getPathWithoutLocale(pathname: string) {
-	const segments = pathname.split('/')
-	if (segments.length > 1 && locales.includes(segments[1])) {
-		return '/' + segments.slice(2).join('/')
-	}
-	return pathname
+function stripLocaleFromPath(pathname: string) {
+	const parts = pathname.split('/')
+	return locales.includes(parts[1]) ? '/' + parts.slice(2).join('/') : pathname
 }
 
 function addLocaleCookie(response: NextResponse, locale: string) {
 	response.cookies.set('NEXT_LOCALE', locale, {
-		maxAge: 60 * 60 * 24 * 365, // 1 year
+		maxAge: 60 * 60 * 24 * 365,
 		path: '/'
 	})
 	return response
@@ -63,99 +51,78 @@ const intlMiddleware = createMiddleware({
 	localePrefix: 'always'
 })
 
-export async function middleware(request: NextRequest) {
-	const { pathname } = request.nextUrl
-	const pathLocale = getLocaleFromPathname(pathname)
-	const pathWithoutLocale = getPathWithoutLocale(pathname)
+function isProtected(path: string) {
+	return protectedRoutes.some(route => {
+		const pattern = new RegExp(`^${route.replace(/:\w+\*/g, '.*')}$`)
+		return pattern.test(path)
+	})
+}
+
+async function verifyToken(token: string) {
+	try {
+		const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/admins/verify`, { token })
+		return res.status === 200
+	} catch {
+		return false
+	}
+}
+
+export async function middleware(req: NextRequest) {
+	const { pathname } = req.nextUrl
+	const localeFromPath = getLocaleFromPath(pathname)
+	const pathWithoutLocale = stripLocaleFromPath(pathname)
 
 	if (pathname.startsWith('/api/')) return NextResponse.next()
 
+	// Redirect to locale if none
 	if (
 		pathname === '/' ||
 		(!pathname.match(new RegExp(`^/(${locales.join('|')})(/|$)`)) && !pathname.match(/\.\w+$/))
 	) {
-		const locale = getLocale(request)
+		const locale = getLocale(req)
 		const newPath = `/${locale}${pathname === '/' ? '' : pathname}`
-		request.nextUrl.pathname = newPath
-		const response = NextResponse.redirect(request.nextUrl)
-		return addLocaleCookie(response, locale)
+		req.nextUrl.pathname = newPath
+		const res = NextResponse.redirect(req.nextUrl)
+		return addLocaleCookie(res, locale)
 	}
 
-	const isAdminRoute = protectedRoutes.some(route => {
-		const pattern = new RegExp(`^${route.replace(/:\w+\*/g, '.*')}$`)
-		return pattern.test(pathWithoutLocale)
-	})
+	const token = req.cookies.get(TOKEN.ADMIN_ACCESS_TOKEN)?.value || ''
+	const isAdmin = isProtected(pathWithoutLocale)
+	const isLogin = pathname.includes('/admin-login') || pathWithoutLocale === '/admin-login'
 
-	if (isAdminRoute) {
-		try {
-			const token = request.cookies.get(TOKEN.ADMIN_ACCESS_TOKEN)?.value
-			if (!token) {
-				const locale = pathLocale || getLocale(request)
-				const response = NextResponse.redirect(new URL(`/${locale}/admin-login`, request.url))
-				return addLocaleCookie(response, locale)
-			}
+	if (isAdmin && token) {
+		const valid = await verifyToken(token)
 
-			const decoded = (
-				await axios.post<{ login: string }>(`${process.env.NEXT_PUBLIC_API_URL}/admin/verify`, {
-					token
-				})
-			).data
-
-			const admins = (await axios.get<Admin[]>(`${process.env.NEXT_PUBLIC_API_URL}/admin/all`)).data
-			const admin = admins.find(admin => admin.login === decoded.login)
-
-			if (admin) {
-				if (pathLocale) {
-					const res = await intlMiddleware(request)
-					return addLocaleCookie(res, pathLocale)
-				}
-				return intlMiddleware(request)
-			}
-
-			const locale = pathLocale || getLocale(request)
-			const response = NextResponse.redirect(new URL(`/${locale}/admin-login`, request.url))
-			return addLocaleCookie(response, locale)
-		} catch (error) {
-			const locale = pathLocale || getLocale(request)
-			const response = NextResponse.redirect(new URL(`/${locale}/admin-login`, request.url))
-			return addLocaleCookie(response, locale)
+		if (!valid) {
+			const locale = localeFromPath || getLocale(req)
+			const res = NextResponse.redirect(new URL(`/${locale}/admin-login`, req.url))
+			return addLocaleCookie(res, locale)
 		}
-	}
-
-	const isLoginPage = pathname.includes('/admin-login') || pathWithoutLocale === '/admin-login'
-	if (isLoginPage) {
-		const token = request.cookies.get(TOKEN.ADMIN_ACCESS_TOKEN)?.value
-		if (!token) {
-			if (pathLocale) {
-				const res = await intlMiddleware(request)
-				return addLocaleCookie(res, pathLocale)
-			}
-			return intlMiddleware(request)
+	} else if (isLogin && token) {
+		const valid = await verifyToken(token)
+		if (valid) {
+			const locale = localeFromPath || getLocale(req)
+			const res = NextResponse.redirect(new URL(`/${locale}/admin`, req.url))
+			return addLocaleCookie(res, locale)
 		}
-
-		const locale = pathLocale || getLocale(request)
-		const response = NextResponse.redirect(new URL(`/${locale}/admin`, request.url))
-		return addLocaleCookie(response, locale)
+	} else if (isAdmin && !token) {
+		const locale = localeFromPath || getLocale(req)
+		const res = NextResponse.redirect(new URL(`/${locale}/admin-login`, req.url))
+		return addLocaleCookie(res, locale)
 	}
 
-	if (pathLocale) {
-		const res = await intlMiddleware(request)
-		return addLocaleCookie(res, pathLocale)
-	}
-
-	return intlMiddleware(request)
+	const locale = localeFromPath || getLocale(req)
+	const response = await intlMiddleware(req)
+	return addLocaleCookie(response, locale)
 }
 
 export const config = {
 	matcher: [
-		// Root path
 		'/',
-		// Main pages
 		'/about/:path*',
 		'/contacts/:path*',
 		'/catalog/:path*',
 		'/product/:path*',
-		// Admin routes with and without locales
 		'/admin/:path*',
 		'/admin-login/:path*',
 		'/:locale/admin/:path*',

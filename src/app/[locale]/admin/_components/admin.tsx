@@ -2,7 +2,6 @@
 
 import { useGetAdmins } from '@/hooks/useAdmin'
 import { useGetFirstLevelCategories, useGetSecondLevelCategories } from '@/hooks/useCategories'
-import { useGetGallery } from '@/hooks/useGallery'
 import { useGetProducts } from '@/hooks/useProducts'
 import { useGetSlides } from '@/hooks/useSlides'
 import { useGetFiles } from '@/hooks/useStorage'
@@ -10,7 +9,6 @@ import { useGetTexts } from '@/hooks/useText'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { AdminCategoriesTab } from './admin-categories/admin-categories'
-import { AdminGalleryTab } from './admin-gallery/admin-gallery'
 import { AdminProductsTab } from './admin-products/admin-products'
 import { AdminSlidesTab } from './admin-slides/admin-slides'
 import { AdminStorageControlTab } from './admin-storage/admin-storage-control-tab'
@@ -25,7 +23,8 @@ function AdminComponent() {
 	const { data: admins } = useGetAdmins()
 	const { data: files } = useGetFiles()
 	const { data: slides } = useGetSlides()
-	const { data: galleries } = useGetGallery()
+
+	console.log(files)
 
 	const [currentTab, setCurrentTab] = useState(0)
 
@@ -41,7 +40,6 @@ function AdminComponent() {
 			products={products}
 		/>,
 		<AdminSlidesTab slides={slides} />,
-		<AdminGalleryTab galleries={galleries} />,
 		<AdminsTab admins={admins} />,
 		<AdminTextFieldsTab texts={texts} />,
 		<AdminStorageControlTab files={files} />
@@ -78,14 +76,6 @@ function AdminComponent() {
 					</li>
 					<li
 						onClick={() => setCurrentTab(3)}
-						className={`text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
-							currentTab === 3 ? 'text-blue-500' : ''
-						}`}
-					>
-						Галерея
-					</li>
-					<li
-						onClick={() => setCurrentTab(4)}
 						className={`text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
 							currentTab === 4 ? 'text-blue-500' : ''
 						}`}
@@ -93,7 +83,7 @@ function AdminComponent() {
 						Адміністратори
 					</li>
 					<li
-						onClick={() => setCurrentTab(5)}
+						onClick={() => setCurrentTab(4)}
 						className={`text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
 							currentTab === 5 ? 'text-blue-500' : ''
 						}`}
@@ -101,7 +91,7 @@ function AdminComponent() {
 						Текстові поля
 					</li>
 					<li
-						onClick={() => setCurrentTab(6)}
+						onClick={() => setCurrentTab(5)}
 						className={`text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
 							currentTab === 6 ? 'text-blue-500' : ''
 						}`}

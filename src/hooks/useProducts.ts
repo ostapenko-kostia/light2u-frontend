@@ -1,10 +1,5 @@
 import { productsService } from '@/services/products.service'
-import type { Product, ProductInfo } from '@prisma/client'
 import { useMutation, useQuery } from '@tanstack/react-query'
-
-type ProductWithInfo = Product & {
-	info: ProductInfo[]
-}
 
 interface ProductInfoInput {
 	key: string
@@ -25,11 +20,7 @@ interface BaseProductData {
 export const useGetProducts = () => {
 	return useQuery({
 		queryKey: ['products get'],
-		queryFn: async () => {
-			const res = await productsService.getAllProducts()
-			if (!res?.data) return Promise.reject()
-			return res.data as ProductWithInfo[]
-		},
+		queryFn: async () => await productsService.getAllProducts(),
 		refetchOnWindowFocus: false
 	})
 }
@@ -112,4 +103,3 @@ export const useMoveProductDown = () => {
 		}
 	})
 }
-

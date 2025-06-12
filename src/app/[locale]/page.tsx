@@ -1,8 +1,6 @@
 import { HomeCategories } from '@/components/home/categories'
-import { HomeGallery } from '@/components/home/gallery'
 import { Hero } from '@/components/home/hero'
 import { categoriesService } from '@/services/categories.service'
-import { galleryService } from '@/services/gallery.service'
 import { slideService } from '@/services/slides.service'
 
 export const revalidate = 180
@@ -11,9 +9,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 	const locale = (await params).locale
 	const firstLevelCategories = await categoriesService.getAllFirstLevelCategories()
 	const slides = (await slideService.getAllSlides())?.data
-	const galleries = (await galleryService.getAll())?.data
 
-	// Фільтрація слайдів за поточною локаллю
 	const localizedSlides = slides?.filter(
 		slide => slide.locale === locale || (!slide.locale && locale === 'uk')
 	)
@@ -25,7 +21,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 				categories={firstLevelCategories}
 				locale={locale}
 			/>
-			<HomeGallery galleries={galleries} />
 		</section>
 	)
 }

@@ -4,14 +4,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 export function useGetFirstLevelCategories() {
 	return useQuery({
 		queryKey: ['categories get first level'],
-		queryFn: () => categoriesService.getAllFirstLevelCategories()
+		queryFn: async () => await categoriesService.getAllFirstLevelCategories()
 	})
 }
 
 export function useGetSecondLevelCategories() {
 	return useQuery({
 		queryKey: ['categories get second level'],
-		queryFn: () => categoriesService.getAllSecondLevelCategories()
+		queryFn: async () => await categoriesService.getAllSecondLevelCategories()
 	})
 }
 

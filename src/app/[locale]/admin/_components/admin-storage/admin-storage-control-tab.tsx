@@ -9,6 +9,7 @@ interface Props {
 }
 
 export function AdminStorageControlTab({ files }: Props) {
+	console.log(files)
 	return (
 		<div className='p-4 animate-opacity-1'>
 			<div className='flex justify-between items-center mb-6 max-sm:flex-col max-sm:gap-4'>
@@ -49,12 +50,11 @@ export function AdminStorageControlTab({ files }: Props) {
 						{files
 							?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 							.map(file => {
-								const url = process.env.NEXT_PUBLIC_STORAGE_URL + file.url
 								return (
 									<tr key={file.title}>
 										<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
 											<Image
-												src={url.length ? url : '/placeholder-image.jpg'}
+												src={file.url.length ? file.url : '/placeholder-image.jpg'}
 												alt={file.title}
 												width={120}
 												height={120}

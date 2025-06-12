@@ -53,7 +53,7 @@ export function AdminCreateFirstLevelCategory() {
 						color='#fff'
 						size={20}
 					/>{' '}
-					Додати категорію першого рівня
+					Додати категорію
 				</button>
 			}
 		>

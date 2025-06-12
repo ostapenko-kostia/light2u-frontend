@@ -15,11 +15,7 @@ export function useEditText() {
 export function useGetTexts() {
 	return useQuery({
 		queryKey: ['texts get'],
-		queryFn: async () => {
-			const res = await textsService.getAllTexts()
-			if (!res) return Promise.reject()
-			return res
-		},
+		queryFn: async () => await textsService.getAllTexts(),
 		refetchOnWindowFocus: false
 	})
 }
