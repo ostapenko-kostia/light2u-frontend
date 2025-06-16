@@ -1,9 +1,9 @@
 'use client'
 
 import { ProductCard } from '@/components/layout/product-card'
-import type { FirstLevelCategory, Product, ProductInfo, SecondLevelCategory } from '@prisma/client'
 import { ChevronDownIcon, ChevronRightIcon } from 'lucide-react'
 import { Fragment, useState } from 'react'
+import { IFirstLevelCategory, IProduct, ISecondLevelCategory } from '@/typing/interfaces'
 import { AdminProductCreate } from './admin-product-create'
 import { AdminProductDelete } from './admin-product-delete'
 import { AdminProductDuplicate } from './admin-product-duplicate'
@@ -11,14 +11,10 @@ import { AdminProductEdit } from './admin-product-edit'
 import { AdminProductMoveUp } from './admin-product-move-up'
 import { AdminProductMoveDown } from './admin-product-move-down'
 
-type ProductWithInfo = Product & {
-	info: ProductInfo[]
-}
-
 interface Props {
-	products: ProductWithInfo[] | undefined
-	firstLevelCategories: FirstLevelCategory[] | undefined
-	secondLevelCategories: SecondLevelCategory[] | undefined
+	products: IProduct[] | undefined
+	firstLevelCategories: IFirstLevelCategory[] | undefined
+	secondLevelCategories: ISecondLevelCategory[] | undefined
 }
 
 export function AdminProductsTab({ products, firstLevelCategories, secondLevelCategories }: Props) {
@@ -125,10 +121,10 @@ export function AdminProductsTab({ products, firstLevelCategories, secondLevelCa
 														?.sort((a, b) => b.order - a.order)
 														.map(product => (
 															<div
-																className='relative max-[500px]:pr-0'
+																className='relative max-[500px]:pr-0 border border-gray-300 rounded-md'
 																key={product.id}
 															>
-																<div className='mt-auto flex items-center justify-around max-[500px]:gap-1 max-[500px]:justify-between p-0 right-0 bottom-0 rounded-md'>
+																<div className='mt-auto flex items-center justify-around max-[500px]:gap-1 max-[500px]:justify-between right-0 bottom-0 rounded-md border-b border-gray-300 p-2 rounded-b-none'>
 																	<AdminProductEdit
 																		product={product}
 																		categories={secondCategories}
@@ -144,7 +140,9 @@ export function AdminProductsTab({ products, firstLevelCategories, secondLevelCa
 																		productName={product.name}
 																	/>
 																</div>
-																<ProductCard product={product} />
+																<div className='p-2'>
+																	<ProductCard product={product} />
+																</div>
 															</div>
 														))}
 													<AdminProductCreate

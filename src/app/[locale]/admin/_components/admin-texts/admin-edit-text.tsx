@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { useEditText } from '@/hooks/useText'
-import { TextField } from '@prisma/client'
+import { ITextField } from '@/typing/interfaces'
 import { useQueryClient } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import { useContext, useEffect, useState } from 'react'
@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 interface Props {
-	text: TextField
+	text: ITextField
 }
 
 interface Form {
@@ -33,6 +33,7 @@ function AdminEditTextComponent({ text }: Props) {
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['texts get'] })
+			toast.success('Текст успішно змінено!')
 			closeDialog?.()
 		}
 		if (isError) {
@@ -43,7 +44,7 @@ function AdminEditTextComponent({ text }: Props) {
 
 	const edit = async (data: Form) => {
 		await editFunc({
-			id: text.id,
+			id: Number(text.id),
 			text: data.text ?? undefined
 		})
 	}

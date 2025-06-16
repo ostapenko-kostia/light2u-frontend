@@ -3,14 +3,14 @@
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { useEditFirstLevelCategory, useEditSecondLevelCategory } from '@/hooks/useCategories'
-import { FirstLevelCategory, SecondLevelCategory } from '@prisma/client'
+import { IFirstLevelCategory, ISecondLevelCategory } from '@/typing/interfaces'
 import { useQueryClient } from '@tanstack/react-query'
 import { useContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 interface Props {
-	category: FirstLevelCategory | SecondLevelCategory
+	category: IFirstLevelCategory | ISecondLevelCategory
 }
 
 interface Form {
@@ -52,6 +52,7 @@ export function AdminEditCategory({ category }: Props) {
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['categories get'] })
+			toast.success('Категорію успішно змінено!')
 			closeDialog?.()
 		}
 		if (isError) {
@@ -62,7 +63,7 @@ export function AdminEditCategory({ category }: Props) {
 
 	const edit = async (data: Form) => {
 		const formData = {
-			id: category.id,
+			id: Number(category.id),
 			nameUk: data.name.uk,
 			nameRu: data.name.ru,
 			image: data.image ?? undefined

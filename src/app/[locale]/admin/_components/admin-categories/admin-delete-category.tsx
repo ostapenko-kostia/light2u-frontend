@@ -2,15 +2,15 @@
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { useDeleteFirstLevelCategory, useDeleteSecondLevelCategory } from '@/hooks/useCategories'
-import { FirstLevelCategory, Product, SecondLevelCategory } from '@prisma/client'
+import { IFirstLevelCategory, IProduct, ISecondLevelCategory } from '@/typing/interfaces'
 import { useQueryClient } from '@tanstack/react-query'
 import { useContext, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 interface Props {
-	category: FirstLevelCategory | SecondLevelCategory
-	products: Product[] | undefined
-	secondLevelCategories?: SecondLevelCategory[]
+	category: IFirstLevelCategory | ISecondLevelCategory
+	products: IProduct[] | undefined
+	secondLevelCategories?: ISecondLevelCategory[]
 }
 
 export function AdminDeleteCategory({ category, products, secondLevelCategories }: Props) {
@@ -43,6 +43,7 @@ export function AdminDeleteCategory({ category, products, secondLevelCategories 
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['categories get'] })
+			toast.success('Категорію успішно видалено!')
 			closeDialog?.()
 		}
 		if (isError) {
@@ -54,10 +55,10 @@ export function AdminDeleteCategory({ category, products, secondLevelCategories 
 	const handleDelete = async () => {
 		if ('parentCategorySlug' in category) {
 			// This is a second level category
-			await deleteSecondLevelFunc(category.id)
+			await deleteSecondLevelFunc(Number(category.id))
 		} else {
 			// This is a first level category
-			await deleteFirstLevelFunc(category.id)
+			await deleteFirstLevelFunc(Number(category.id))
 		}
 	}
 

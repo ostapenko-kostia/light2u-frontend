@@ -27,6 +27,7 @@ export function AdminProductDelete({ productName, productId }: Props) {
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['products get'] })
+			toast.success('Товар успішно видалено!')
 			closeDialog?.()
 		}
 		if (isError) {

@@ -32,6 +32,7 @@ export function AdminCreateFirstLevelCategory() {
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['categories get'] })
+			toast.success('Категорію першого рівня успішно створено!')
 			closeDialog?.()
 		}
 		if (isError) {

@@ -4,7 +4,7 @@ import { Dialog } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { Textarea } from '@/components/ui/textarea'
 import { useUpdateSlide } from '@/hooks/useSlides'
-import { Slide } from '@prisma/client'
+import { ISlide } from '@/typing/interfaces'
 import { useQueryClient } from '@tanstack/react-query'
 import { EditIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -20,7 +20,7 @@ interface Form {
 }
 
 interface Props {
-	slide: Slide
+	slide: ISlide
 }
 
 export function AdminSlideEdit({ slide }: Props) {
@@ -57,6 +57,7 @@ export function AdminSlideEdit({ slide }: Props) {
 		if (isSuccess) {
 			loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['slides get'] })
+			toast.success('Слайд успішно змінено!')
 		}
 		if (isError) {
 			loadingToastId && toast.dismiss(loadingToastId)

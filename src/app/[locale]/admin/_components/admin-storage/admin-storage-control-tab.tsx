@@ -9,7 +9,6 @@ interface Props {
 }
 
 export function AdminStorageControlTab({ files }: Props) {
-	console.log(files)
 	return (
 		<div className='p-4 animate-opacity-1'>
 			<div className='flex justify-between items-center mb-6 max-sm:flex-col max-sm:gap-4'>

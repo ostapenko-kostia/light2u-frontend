@@ -29,6 +29,7 @@ export function CreateAdmin() {
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['admins get'] })
+			toast.success('Адміна успішно створено!')
 			closeDialog?.()
 		}
 		if (isError) {

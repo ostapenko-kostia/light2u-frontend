@@ -36,6 +36,7 @@ export function AdminCreateSecondLevelCategory({ parentCategorySlug }: Props) {
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['categories get'] })
+			toast.success('Підкатегорію успішно створено!')
 			closeDialog?.()
 		}
 		if (isError) {

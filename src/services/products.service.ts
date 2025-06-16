@@ -27,15 +27,15 @@ class ProductsService {
 	}
 
 	async duplicateProduct(id: number) {
-		return await api.post(`/products/duplicate/${id}`)
+		return await api.post(`/products/${id}/duplicate`)
 	}
 
 	async moveProductUp(id: number) {
-		return await api.put(`/products/move-up/${id}`)
+		return await api.patch(`/products/${id}/move-up`)
 	}
 
 	async moveProductDown(id: number) {
-		return await api.put(`/products/move-down/${id}`)
+		return await api.patch(`/products/${id}/move-down`)
 	}
 }
 
