@@ -15,7 +15,7 @@ export default async function ProductPage({
 	const { slug, locale } = await params
 	const { t } = await getServerTranslation(locale)
 
-	const products = (await productsService.getAllProducts())?.data
+	const products = await productsService.getAllProducts()
 
 	const product = products?.find(p => {
 		return p.slug === slug && (p.locale === locale || (!p.locale && locale === 'uk'))

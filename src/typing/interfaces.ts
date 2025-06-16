@@ -75,3 +75,15 @@ export interface IFile {
 	createdAt: string
 	url: string
 }
+
+export interface ICatalogSearchParams {
+	search?: string
+	firstLevelCategory?: string
+	secondLevelCategory?: string
+}
+
+export interface ICatalogData {
+	firstLevelCategories: any[] | undefined
+	secondLevelCategories: any[] | undefined
+	products: any[] | undefined
+}

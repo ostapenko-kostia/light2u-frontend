@@ -1,10 +1,10 @@
 import { match } from '@formatjs/intl-localematcher'
+import axios from 'axios'
 import Negotiator from 'negotiator'
 import createMiddleware from 'next-intl/middleware'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { defaultLocale, locales } from './lib/i18n'
-import axios from 'axios'
 import { TOKEN } from './typing/enums'
 
 const protectedRoutes = ['/admin', '/admin/:path*']

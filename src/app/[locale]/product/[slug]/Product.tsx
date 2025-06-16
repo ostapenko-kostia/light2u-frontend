@@ -1,17 +1,10 @@
 'use client'
 
 import { useTranslation } from '@/hooks/useTranslation'
-import { Product as ProductType } from '@prisma/client'
+import { IProduct } from '@/typing/interfaces'
 import Link from 'next/link'
 
-interface ProductWithInfo extends ProductType {
-	info: {
-		key: string
-		value: string
-	}[]
-}
-
-export function Product({ product }: { product: ProductWithInfo }) {
+export function Product({ product }: { product: IProduct }) {
 	const { t } = useTranslation()
 
 	return (

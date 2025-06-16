@@ -8,7 +8,7 @@ export const revalidate = 180
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
 	const locale = (await params).locale
 	const firstLevelCategories = await categoriesService.getAllFirstLevelCategories()
-	const slides = (await slideService.getAllSlides())?.data
+	const slides = await slideService.getAllSlides()
 
 	const localizedSlides = slides?.filter(
 		slide => slide.locale === locale || (!slide.locale && locale === 'uk')
