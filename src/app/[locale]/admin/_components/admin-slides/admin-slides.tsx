@@ -1,9 +1,9 @@
-import { Slide } from '@prisma/client'
 import { useState } from 'react'
 import { AdminSlidesList } from './admin-slides-list'
+import { ISlide } from '@/typing/interfaces'
 
 interface Props {
-	slides: Slide[] | undefined
+	slides: ISlide[] | undefined
 }
 
 export function AdminSlidesTab({ slides }: Props) {

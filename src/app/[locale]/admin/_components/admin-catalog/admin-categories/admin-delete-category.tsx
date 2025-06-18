@@ -4,6 +4,7 @@ import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { useDeleteFirstLevelCategory, useDeleteSecondLevelCategory } from '@/hooks/useCategories'
 import { IFirstLevelCategory, IProduct, ISecondLevelCategory } from '@/typing/interfaces'
 import { useQueryClient } from '@tanstack/react-query'
+import { Trash2Icon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -95,7 +96,7 @@ export function AdminDeleteCategory({ category, products, secondLevelCategories 
 					title={isDisabled() ? getDisabledTitle() : 'Видалити'}
 					className='ml-4 text-red-600 hover:text-red-900 disabled:text-red-200 disabled:cursor-not-allowed'
 				>
-					Видалити
+					<Trash2Icon />
 				</button>
 			}
 		>

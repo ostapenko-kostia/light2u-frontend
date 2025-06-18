@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateProduct } from '@/hooks/useProducts'
-import { SecondLevelCategory } from '@prisma/client'
+import { ISecondLevelCategory } from '@/typing/interfaces'
 import { useQueryClient } from '@tanstack/react-query'
 import { ArrowDownIcon, ArrowUpIcon, PlusCircleIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
@@ -30,8 +30,8 @@ interface Form {
 }
 
 interface Props {
-	category: SecondLevelCategory | undefined
-	locale: 'uk' | 'ru'
+	category: ISecondLevelCategory | undefined
+	locale: string
 }
 
 export function AdminProductCreate({ category, locale }: Props) {
@@ -110,7 +110,7 @@ export function AdminProductCreate({ category, locale }: Props) {
 		<Dialog
 			title='Створити товар'
 			trigger={
-				<button className='min-h-52 w-full h-full flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg hover:border-gray-300'>
+				<button className='min-h-[88px] w-full h-full flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg hover:border-gray-300'>
 					<PlusCircleIcon
 						size={24}
 						className='text-gray-400'

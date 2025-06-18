@@ -8,12 +8,104 @@ import { useGetFiles } from '@/hooks/useStorage'
 import { useGetTexts } from '@/hooks/useText'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
-import { AdminCategoriesTab } from './admin-categories/admin-categories'
-import { AdminProductsTab } from './admin-products/admin-products'
 import { AdminSlidesTab } from './admin-slides/admin-slides'
 import { AdminStorageControlTab } from './admin-storage/admin-storage-control-tab'
 import { AdminTextFieldsTab } from './admin-texts/admin-texts'
 import { AdminsTab } from './admins-tab/admins-tab'
+import { AdminCatalogTab } from './admin-catalog/admin-catalog'
+import clsx from 'clsx'
+import { Dialog } from '@/components/ui/dialog'
+import { MenuIcon } from 'lucide-react'
+
+const Navigation = ({
+	className,
+	activeTab,
+	setActiveTab
+}: {
+	className?: string
+	activeTab: string
+	setActiveTab: (tab: string) => void
+}) => {
+	const [isCatalogOpen, setIsCatalogOpen] = useState(false)
+
+	return (
+		<nav className={clsx('gap-4 flex space-x-1', className)}>
+			<button
+				onClick={() => {
+					setActiveTab('dashboard')
+					setIsCatalogOpen(false)
+				}}
+				className={`px-4 py-2 rounded-md ${
+					activeTab === 'dashboard' ? 'bg-white text-blue-900' : 'hover:bg-blue-700'
+				}`}
+			>
+				Головна
+			</button>
+
+			<div className='relative'>
+				<button
+					onClick={() => {
+						setIsCatalogOpen(!isCatalogOpen)
+						if (!isCatalogOpen) setActiveTab('catalog')
+					}}
+					className={`px-4 py-2 rounded-md flex items-center ${
+						activeTab === 'catalog' ? 'bg-white text-blue-900' : 'hover:bg-blue-700'
+					}`}
+				>
+					Каталог
+				</button>
+			</div>
+
+			<button
+				onClick={() => {
+					setActiveTab('admins')
+					setIsCatalogOpen(false)
+				}}
+				className={`px-4 py-2 rounded-md ${
+					activeTab === 'admins' ? 'bg-white text-blue-900' : 'hover:bg-blue-700'
+				}`}
+			>
+				Адміністратори
+			</button>
+
+			<button
+				onClick={() => {
+					setActiveTab('slides')
+					setIsCatalogOpen(false)
+				}}
+				className={`px-4 py-2 rounded-md ${
+					activeTab === 'slides' ? 'bg-white text-blue-900' : 'hover:bg-blue-700'
+				}`}
+			>
+				Слайди
+			</button>
+
+			<button
+				onClick={() => {
+					setActiveTab('texts')
+					setIsCatalogOpen(false)
+				}}
+				className={`px-4 py-2 rounded-md ${
+					activeTab === 'texts' ? 'bg-white text-blue-900' : 'hover:bg-blue-700'
+				}`}
+			>
+				Текстові поля
+			</button>
+
+			<button
+				onClick={() => {
+					setActiveTab('storage')
+					setIsCatalogOpen(false)
+				}}
+				className={`px-4 py-2 rounded-md ${
+					activeTab === 'storage' ? 'bg-white text-blue-900' : 'hover:bg-blue-700'
+				}`}
+			>
+				Сховище
+			</button>
+		</nav>
+	)
+}
 
 function AdminComponent() {
 	const { data: products } = useGetProducts()
@@ -24,83 +116,72 @@ function AdminComponent() {
 	const { data: files } = useGetFiles()
 	const { data: slides } = useGetSlides()
 
-	console.log(files)
+	const [activeTab, setActiveTab] = useState('catalog')
 
-	const [currentTab, setCurrentTab] = useState(0)
-
-	const tabs = [
-		<AdminProductsTab
-			products={products}
-			firstLevelCategories={firstLevelCategories}
-			secondLevelCategories={secondLevelCategories}
-		/>,
-		<AdminCategoriesTab
-			firstLevelCategories={firstLevelCategories}
-			secondLevelCategories={secondLevelCategories}
-			products={products}
-		/>,
-		<AdminSlidesTab slides={slides} />,
-		<AdminsTab admins={admins} />,
-		<AdminTextFieldsTab texts={texts} />,
-		<AdminStorageControlTab files={files} />
-	]
+	// Content area based on active tab
+	const renderContent = () => {
+		switch (activeTab) {
+			case 'catalog':
+				return (
+					<AdminCatalogTab
+						products={products || []}
+						firstLevelCategories={firstLevelCategories || []}
+						secondLevelCategories={secondLevelCategories || []}
+					/>
+				)
+			case 'admins':
+				return <AdminsTab admins={admins || []} />
+			case 'slides':
+				return <AdminSlidesTab slides={slides || []} />
+			case 'texts':
+				return <AdminTextFieldsTab texts={texts || []} />
+			case 'storage':
+				return <AdminStorageControlTab files={files || []} />
+			default:
+				return (
+					<div className='p-8 text-center'>
+						<h2 className='text-2xl font-bold mb-6'>Вітаємо в адміністративній панелі</h2>
+						<p className='text-gray-600'>Виберіть розділ для управління контентом</p>
+					</div>
+				)
+		}
+	}
 
 	return (
-		<div className='min-h-[80vh] container mx-auto max-sm:px-2 py-8 grid grid-cols-[1fr_2.5fr] max-lg:grid-cols-1 gap-5 animate-opacity-1'>
-			<div className='bg-white rounded-md shadow-sm p-4'>
-				<h2 className='text-3xl text-center my-5 font-semibold'>Адмін панель</h2>
-				<ul className='flex flex-col gap-5 py-5 px-6 h-full w-full'>
-					<li
-						onClick={() => setCurrentTab(0)}
-						className={`text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
-							currentTab === 0 ? 'text-blue-500' : ''
-						}`}
-					>
-						Товари
-					</li>
-					<li
-						onClick={() => setCurrentTab(1)}
-						className={`text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
-							currentTab === 1 ? 'text-blue-500' : ''
-						}`}
-					>
-						Категорії
-					</li>
-					<li
-						onClick={() => setCurrentTab(2)}
-						className={`text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
-							currentTab === 2 ? 'text-blue-500' : ''
-						}`}
-					>
-						Слайди
-					</li>
-					<li
-						onClick={() => setCurrentTab(3)}
-						className={`text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
-							currentTab === 4 ? 'text-blue-500' : ''
-						}`}
-					>
-						Адміністратори
-					</li>
-					<li
-						onClick={() => setCurrentTab(4)}
-						className={`text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
-							currentTab === 5 ? 'text-blue-500' : ''
-						}`}
-					>
-						Текстові поля
-					</li>
-					<li
-						onClick={() => setCurrentTab(5)}
-						className={`text-xl max-sm:text-xl hover:text-blue-500 transition-colors duration-300 cursor-pointer ${
-							currentTab === 6 ? 'text-blue-500' : ''
-						}`}
-					>
-						Сховище
-					</li>
-				</ul>
+		<div className='min-h-screen bg-gray-50'>
+			<div className='bg-gradient-to-r from-blue-800 to-indigo-900 text-white shadow-lg'>
+				<div className='container mx-auto px-4'>
+					<div className='flex justify-between items-center h-16'>
+						<div className='flex items-center'>
+							<h1 className='text-xl font-bold'>Адмін Панель</h1>
+						</div>
+						<Navigation
+							className='max-lg:hidden'
+							activeTab={activeTab}
+							setActiveTab={setActiveTab}
+						/>
+						<Dialog
+							title='Адміністративне меню'
+							trigger={
+								<button className='lg:hidden'>
+									<MenuIcon />
+								</button>
+							}
+						>
+							<Navigation
+								className='flex-col items-center'
+								activeTab={activeTab}
+								setActiveTab={setActiveTab}
+							/>
+						</Dialog>
+					</div>
+				</div>
 			</div>
-			<div className='bg-white rounded-md shadow-sm w-full'>{tabs[currentTab]}</div>
+
+			{/* Main Content Area */}
+			<div className='container mx-auto px-4 py-8 max-sm:p-2'>
+				<div className='bg-white rounded-lg shadow-md p-6 max-sm:p-2 animate-fadeIn'>{renderContent()}</div>
+			</div>
 		</div>
 	)
 }

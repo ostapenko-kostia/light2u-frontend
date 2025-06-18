@@ -2,57 +2,37 @@
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
-import { useEditFirstLevelCategory, useEditSecondLevelCategory } from '@/hooks/useCategories'
-import { IFirstLevelCategory, ISecondLevelCategory } from '@/typing/interfaces'
+import { useCreateFirstLevelCategory } from '@/hooks/useCategories'
 import { useQueryClient } from '@tanstack/react-query'
+import { PlusIcon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-interface Props {
-	category: IFirstLevelCategory | ISecondLevelCategory
-}
-
 interface Form {
 	image: FileList
-	name: {
-		uk: string
-		ru: string
-	}
+	nameUk: string
+	nameRu: string
 }
 
-export function AdminEditCategory({ category }: Props) {
+export function AdminCreateFirstLevelCategory() {
 	const [loadingToastId, setLoadingToastId] = useState('')
-	const queryClient = useQueryClient()
 	const { register, handleSubmit, setValue } = useForm<Form>()
-	const {
-		mutateAsync: editFirstLevelFunc,
-		isPending: isFirstLevelPending,
-		isSuccess: isFirstLevelSuccess,
-		isError: isFirstLevelError
-	} = useEditFirstLevelCategory()
-	const {
-		mutateAsync: editSecondLevelFunc,
-		isPending: isSecondLevelPending,
-		isSuccess: isSecondLevelSuccess,
-		isError: isSecondLevelError
-	} = useEditSecondLevelCategory()
+	const queryClient = useQueryClient()
+	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useCreateFirstLevelCategory()
+
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
 
-	const isPending = isFirstLevelPending || isSecondLevelPending
-	const isSuccess = isFirstLevelSuccess || isSecondLevelSuccess
-	const isError = isFirstLevelError || isSecondLevelError
-
 	useEffect(() => {
 		if (isPending) {
-			const loadingToastId = toast.loading('Триває зміна...')
+			const loadingToastId = toast.loading('Триває створення...')
 			setLoadingToastId(loadingToastId)
 		}
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['categories get'] })
-			toast.success('Категорію успішно змінено!')
+			toast.success('Категорію першого рівня успішно створено!')
 			closeDialog?.()
 		}
 		if (isError) {
@@ -61,34 +41,22 @@ export function AdminEditCategory({ category }: Props) {
 		}
 	}, [isPending, isSuccess, isError])
 
-	const edit = async (data: Form) => {
-		const formData = {
-			id: Number(category.id),
-			nameUk: data.name.uk,
-			nameRu: data.name.ru,
-			image: data.image ?? undefined
-		}
-
-		if ('parentCategorySlug' in category) {
-			// This is a second level category - keep the existing parentCategorySlug
-			await editSecondLevelFunc({
-				...formData,
-				parentCategorySlug: category.parentCategorySlug
-			})
-		} else {
-			// This is a first level category
-			await editFirstLevelFunc(formData)
-		}
+	const onSubmit = (data: Form) => {
+		createFunc(data)
 	}
 
 	return (
 		<Dialog
-			title='Змінити категорію'
-			trigger={<button className='text-blue-600 hover:text-blue-900'>Редагувати</button>}
+			title='Створити категорію першого рівня'
+			trigger={
+				<button className='text-gray-600 px-4 py-2 rounded flex items-center justify-center gap-2 w-full border border-gray-300 mt-3 cursor-pointer hover:bg-gray-200 transition-colors duration-200'>
+					<PlusIcon size={20} /> Додати категорію
+				</button>
+			}
 		>
 			<form
 				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-8'
-				onSubmit={handleSubmit(data => edit(data))}
+				onSubmit={handleSubmit(onSubmit)}
 			>
 				<div>
 					<FileInput
@@ -112,10 +80,10 @@ export function AdminEditCategory({ category }: Props) {
 					<input
 						className='w-full rounded-md border border-gray-500 bg-white px-5 py-3 text-sm placeholder:text-gray-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
 						type='text'
+						required
 						placeholder='Категорія'
 						id='nameUk'
-						defaultValue={(category.name as { uk: string }).uk}
-						{...register('name.uk')}
+						{...register('nameUk', { required: true })}
 					/>
 				</div>
 				<div className='flex items-start flex-col gap-3'>
@@ -128,17 +96,17 @@ export function AdminEditCategory({ category }: Props) {
 					<input
 						className='w-full rounded-md border border-gray-500 bg-white px-5 py-3 text-sm placeholder:text-gray-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
 						type='text'
-						defaultValue={(category.name as { ru: string }).ru}
+						required
 						placeholder='Категорія'
 						id='nameRu'
-						{...register('name.ru')}
+						{...register('nameRu', { required: true })}
 					/>
 				</div>
 				<button
 					type='submit'
 					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
 				>
-					Зберегти
+					Створити
 				</button>
 			</form>
 		</Dialog>

@@ -3,8 +3,7 @@
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { useUpdateProduct } from '@/hooks/useProducts'
-import { Product, ProductInfo, SecondLevelCategory } from '@prisma/client'
-import { useQueryClient } from '@tanstack/react-query'
+import { IProduct, IProductInfo, ISecondLevelCategory } from '@/typing/interfaces'
 import { ArrowDownIcon, ArrowUpIcon, EditIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -22,13 +21,12 @@ interface Form {
 }
 
 interface Props {
-	categories: SecondLevelCategory[] | undefined
-	product: Product & { info: ProductInfo[] }
+	categories: ISecondLevelCategory[] | undefined
+	product: IProduct & { info: IProductInfo[] }
 }
 
 export function AdminProductEdit({ categories, product }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
-	const queryClient = useQueryClient()
 	const { register, handleSubmit, setValue, control } = useForm<Form>({
 		defaultValues: {
 			productInfo: product.info.map(info => ({
@@ -71,7 +69,7 @@ export function AdminProductEdit({ categories, product }: Props) {
 		}
 		if (isSuccess) {
 			loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['products get'] })
+			window.location.reload()
 			toast.success('Товар успішно змінено')
 			closeDialog?.()
 		}
