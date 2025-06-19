@@ -1,15 +1,15 @@
 import { getServerTranslation } from '@/lib/server-translation'
-import { FirstLevelCategory } from '@prisma/client'
 import * as motion from 'framer-motion/client'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Container } from '../layout/container'
+import { IFirstLevelCategory } from '@/typing/interfaces'
 
 export async function HomeCategories({
 	categories,
 	locale
 }: {
-	categories: FirstLevelCategory[] | undefined
+	categories: IFirstLevelCategory[] | undefined
 	locale: string
 }) {
 	const { t } = await getServerTranslation(locale)

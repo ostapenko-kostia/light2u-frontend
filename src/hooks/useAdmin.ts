@@ -4,11 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 export function useGetAdmins() {
 	return useQuery({
 		queryKey: ['admins get'],
-		queryFn: async () => {
-			const res = await adminService.getAllAdmins()
-			if (!res?.data) return Promise.reject()
-			return res.data
-		},
+		queryFn: async () => await adminService.getAllAdmins(),
 		refetchOnWindowFocus: false
 	})
 }
@@ -29,25 +25,6 @@ export function useAdminCreate() {
 		mutationKey: ['admin create'],
 		mutationFn: async ({ email, password }: { email: string; password: string }) => {
 			const res = await adminService.createAdmin(email, password)
-			if (!res?.data) return Promise.reject()
-			return res
-		}
-	})
-}
-
-export function useAdminEdit() {
-	return useMutation({
-		mutationKey: ['admin edit'],
-		mutationFn: async ({
-			id,
-			email,
-			password
-		}: {
-			id: number
-			email: string
-			password: string
-		}) => {
-			const res = await adminService.editAdmin(id, { email, password })
 			if (!res?.data) return Promise.reject()
 			return res
 		}

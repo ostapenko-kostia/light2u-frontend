@@ -32,7 +32,8 @@ export function CreateFile() {
 		}
 		if (isSuccess) {
 			loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['storage get'] })
+			queryClient.invalidateQueries({ queryKey: ['files get'] })
+			toast.success('Файл успішно завантажено!')
 			closeDialog?.()
 		}
 		if (isError) {

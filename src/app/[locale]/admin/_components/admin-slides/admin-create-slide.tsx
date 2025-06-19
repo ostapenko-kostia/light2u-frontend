@@ -40,6 +40,7 @@ export function AdminSlideCreate({ locale }: Props) {
 		if (isSuccess) {
 			loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['slides get'] })
+			toast.success('Слайд успішно створено!')
 		}
 		if (isError) {
 			loadingToastId && toast.dismiss(loadingToastId)

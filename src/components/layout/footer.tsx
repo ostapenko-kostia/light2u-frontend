@@ -8,7 +8,7 @@ export function Footer() {
 				<span className='text-center text-sm text-gray-500 select-none'>
 					© {new Date().getFullYear()}, Light 2U. This website was developed by{' '}
 					<Link
-						href='https://t.me/khos_streks'
+						href='https://ostapenko.pp.ua'
 						target='_blank'
 						className='text-blue-500 underline underline-offset-4 hover:text-blue-600 transition-colors duration-300'
 					>

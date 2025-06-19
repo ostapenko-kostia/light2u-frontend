@@ -24,6 +24,7 @@ export function AdminDeleteSlide({ id }: Props) {
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['slides get'] })
+			toast.success('Слайд успішно видалено!')
 		}
 		if (isError) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)

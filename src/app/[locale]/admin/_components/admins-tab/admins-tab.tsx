@@ -1,10 +1,9 @@
-import { Admin } from '@prisma/client'
+import { IAdmin } from '@/typing/interfaces'
 import { CreateAdmin } from './create-admin'
-import { EditAdmin } from './edit-admin'
 import { DeleteAdmin } from './delete-admin'
 
 interface Props {
-	admins: Admin[] | undefined
+	admins: IAdmin[] | undefined
 }
 
 export function AdminsTab({ admins }: Props) {
@@ -34,18 +33,6 @@ export function AdminsTab({ admins }: Props) {
 								scope='col'
 								className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
 							>
-								Дата створення
-							</th>
-							<th
-								scope='col'
-								className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
-							>
-								Останнє оновлення
-							</th>
-							<th
-								scope='col'
-								className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
-							>
 								Дії
 							</th>
 						</tr>
@@ -56,14 +43,10 @@ export function AdminsTab({ admins }: Props) {
 								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>{admin.id}</td>
 								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>{admin.login}</td>
 								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-									{new Date(admin.createdAt).toLocaleDateString()}
-								</td>
-								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-									{new Date(admin.updatedAt).toLocaleDateString()}
-								</td>
-								<td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-									<EditAdmin admin={admin} />
-									<DeleteAdmin admin={admin} admins={admins} />
+									<DeleteAdmin
+										admin={admin}
+										admins={admins}
+									/>
 								</td>
 							</tr>
 						))}

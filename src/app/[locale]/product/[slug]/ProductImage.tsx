@@ -1,8 +1,7 @@
 'use client'
 
-import { Product } from '@prisma/client'
+import { IProduct } from '@/typing/interfaces'
 import { Maximize2 } from 'lucide-react'
-import Image from 'next/image'
 import { useRef, useState } from 'react'
 import 'swiper/css'
 import 'swiper/css/navigation'
@@ -11,7 +10,7 @@ import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react'
 import Lightbox from 'yet-another-react-lightbox'
 import 'yet-another-react-lightbox/styles.css'
 
-export function ProductImage({ product }: { product: Product }) {
+export function ProductImage({ product }: { product: IProduct }) {
 	const [isOpen, setIsOpen] = useState(false)
 	const [activeIndex, setActiveIndex] = useState(0)
 	const swiperRef = useRef<SwiperRef>(null)

@@ -25,8 +25,8 @@ export function DeleteFile({ file }: Props) {
 		}
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['storage get'] })
-			toast.success('Успішно! Файл буде видалений протягом 5 хвилин', { duration: 3000 })
+			toast.success('Файл успішно видалено!')
+			queryClient.invalidateQueries({ queryKey: ['files get'] })
 			closeDialog?.()
 		}
 		if (isError) {

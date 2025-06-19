@@ -4,11 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 export function useGetFiles() {
 	return useQuery({
 		queryKey: ['files get'],
-		queryFn: async () => {
-			const res = await fileService.getAllFiles()
-			if (!res?.data) return Promise.reject()
-			return res.data
-		},
+		queryFn: async () => await fileService.getAllFiles(),
 		refetchOnWindowFocus: false
 	})
 }

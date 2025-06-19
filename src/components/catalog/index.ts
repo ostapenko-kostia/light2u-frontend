@@ -1,0 +1,5 @@
+export { AnimatedSection } from './animated-section'
+export { FirstLevelCategories } from './first-level-categories'
+export { PageHeader } from './page-header'
+export { ProductsList } from './products-list'
+export { SecondLevelCategories } from './second-level-categories'

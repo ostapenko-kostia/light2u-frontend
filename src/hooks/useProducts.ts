@@ -1,10 +1,5 @@
 import { productsService } from '@/services/products.service'
-import type { Product, ProductInfo } from '@prisma/client'
 import { useMutation, useQuery } from '@tanstack/react-query'
-
-type ProductWithInfo = Product & {
-	info: ProductInfo[]
-}
 
 interface ProductInfoInput {
 	key: string
@@ -19,16 +14,13 @@ interface BaseProductData {
 	categorySlug: string
 	locale: string
 	productInfo: ProductInfoInput[]
+	quantity: number
 }
 
 export const useGetProducts = () => {
 	return useQuery({
 		queryKey: ['products get'],
-		queryFn: async () => {
-			const res = await productsService.getAllProducts()
-			if (!res?.data) return Promise.reject()
-			return res.data as ProductWithInfo[]
-		},
+		queryFn: async () => await productsService.getAllProducts(),
 		refetchOnWindowFocus: false
 	})
 }
@@ -86,6 +78,26 @@ export const useDuplicateProduct = () => {
 	return useMutation({
 		mutationFn: async ({ id }: { id: number }) => {
 			const res = await productsService.duplicateProduct(id)
+			if (!res?.data) return Promise.reject()
+			return res
+		}
+	})
+}
+
+export const useMoveProductUp = () => {
+	return useMutation({
+		mutationFn: async ({ id }: { id: number }) => {
+			const res = await productsService.moveProductUp(id)
+			if (!res?.data) return Promise.reject()
+			return res
+		}
+	})
+}
+
+export const useMoveProductDown = () => {
+	return useMutation({
+		mutationFn: async ({ id }: { id: number }) => {
+			const res = await productsService.moveProductDown(id)
 			if (!res?.data) return Promise.reject()
 			return res
 		}

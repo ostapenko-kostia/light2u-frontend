@@ -2,14 +2,14 @@
 
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { useAdminDelete } from '@/hooks/useAdmin'
-import { Admin } from '@prisma/client'
+import { IAdmin } from '@/typing/interfaces'
 import { useQueryClient } from '@tanstack/react-query'
 import { useContext, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 interface Props {
-	admins: Admin[]
-	admin: Admin
+	admins: IAdmin[]
+	admin: IAdmin
 }
 
 export function DeleteAdmin({ admin, admins }: Props) {
@@ -27,6 +27,7 @@ export function DeleteAdmin({ admin, admins }: Props) {
 		if (isSuccess) {
 			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
 			queryClient.invalidateQueries({ queryKey: ['admins get'] })
+			toast.success('Адміна успішно видалено!')
 			closeDialog?.()
 		}
 		if (isError) {
@@ -42,6 +43,11 @@ export function DeleteAdmin({ admin, admins }: Props) {
 				<button
 					className='ml-4 text-red-600 hover:text-red-900 disabled:text-red-200 disabled:cursor-not-allowed'
 					disabled={admins.length === 1 || admin.login === 'ostapenkokpersonal@gmail.com'}
+					title={
+						admins.length === 1 || admin.login === 'ostapenkokpersonal@gmail.com'
+							? 'Цього адміністратора не можна видаляти'
+							: ''
+					}
 				>
 					Видалити
 				</button>
