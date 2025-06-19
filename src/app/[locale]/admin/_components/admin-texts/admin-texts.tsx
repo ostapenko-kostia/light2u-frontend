@@ -1,11 +1,11 @@
 'use client'
 
-import { TextField } from '@prisma/client'
 import { useState } from 'react'
 import { AdminEditText } from './admin-edit-text'
+import { ITextField } from '@/typing/interfaces'
 
 interface Props {
-	texts: TextField[] | undefined
+	texts: ITextField[] | undefined
 }
 
 const textGroups = {
@@ -24,7 +24,7 @@ export function AdminTextFieldsTab({ texts }: Props) {
 
 	const filteredTexts = texts?.filter(text => text.locale === currentLocale)
 
-	const groupedTexts: Record<string, TextField[]> = {}
+	const groupedTexts: Record<string, ITextField[]> = {}
 
 	filteredTexts?.forEach(text => {
 		const slugParts = text.slug.split('-')

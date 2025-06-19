@@ -1,9 +1,9 @@
-import { FirstLevelCategory, SecondLevelCategory } from '@prisma/client'
 import Image from 'next/image'
 import Link from 'next/link'
+import { IFirstLevelCategory, ISecondLevelCategory } from '@/typing/interfaces'
 
 interface Props {
-	category: FirstLevelCategory | SecondLevelCategory
+	category: IFirstLevelCategory | ISecondLevelCategory
 	locale: string
 	href: string
 }

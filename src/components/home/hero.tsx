@@ -7,9 +7,9 @@ import Link from 'next/link'
 import 'swiper/css'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Container } from '../layout/container'
-import { Slide } from '@prisma/client'
+import { ISlide } from '@/typing/interfaces'
 
-export function Hero({ slides }: { slides: Slide[] | undefined }) {
+export function Hero({ slides }: { slides: ISlide[] | undefined }) {
 	return (
 		<motion.div
 			initial={{ translateY: '15px', opacity: 0 }}

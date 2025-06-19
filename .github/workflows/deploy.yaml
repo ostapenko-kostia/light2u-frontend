@@ -29,8 +29,6 @@ jobs:
 
             /root/.nvm/versions/node/v22.14.0/bin/bun install --silent
 
-            npx prisma generate
-
             /root/.nvm/versions/node/v22.14.0/bin/bun run build
 
             /root/.nvm/versions/node/v22.14.0/bin/pm2 restart light2u-app

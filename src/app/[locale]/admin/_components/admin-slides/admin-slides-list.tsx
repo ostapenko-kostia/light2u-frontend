@@ -1,11 +1,11 @@
-import { Slide } from '@prisma/client'
 import Image from 'next/image'
 import { AdminSlideCreate } from './admin-create-slide'
 import { AdminDeleteSlide } from './admin-delete-slide'
 import { AdminSlideEdit } from './admin-edit-slide'
+import { ISlide } from '@/typing/interfaces'
 
 interface Props {
-	slides: Slide[] | undefined
+	slides: ISlide[] | undefined
 	locale: 'uk' | 'ru'
 }
 

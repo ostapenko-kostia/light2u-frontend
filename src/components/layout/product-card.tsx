@@ -1,9 +1,9 @@
-import { Product } from '@prisma/client'
 import Image from 'next/image'
 import Link from 'next/link'
+import { IProduct } from '@/typing/interfaces'
 
 interface ProductCardProps {
-	product: Product
+	product: IProduct
 }
 
 export function ProductCard({ product }: ProductCardProps) {
