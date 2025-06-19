@@ -1,13 +1,12 @@
 import { useGetProducts } from '@/hooks/useProducts'
-import { useTranslation } from '@/hooks/useTranslation'
 import { ISecondLevelCategory } from '@/typing/interfaces'
 import Image from 'next/image'
 import { AdminDeleteCategory } from '../../admin-categories/admin-delete-category'
 import { AdminEditCategory } from '../../admin-categories/admin-edit-categories'
 import { AdminProductCreate } from '../../admin-products/admin-product-create'
-import { AdminProductDuplicate } from '../../admin-products/admin-product-duplicate'
-import { AdminProductMoveDown } from '../../admin-products/admin-product-move-down'
-import { AdminProductMoveUp } from '../../admin-products/admin-product-move-up'
+import { ProductCard } from './product-card'
+import { UaFlagIcon } from '@/components/icons/ua-flag-icon'
+import { WhiteFlagIcon } from '@/components/icons/white-flag-icon'
 
 interface SecondLevelDetailsPanelProps {
 	category: ISecondLevelCategory
@@ -15,7 +14,6 @@ interface SecondLevelDetailsPanelProps {
 
 export function SecondLevelDetailsPanel({ category }: SecondLevelDetailsPanelProps) {
 	const { data: products } = useGetProducts()
-	const { t, texts, locale } = useTranslation()
 
 	// Filter products that belong to this category
 	const categoryProducts = products?.filter(product => product.categorySlug === category.slug) || []
@@ -28,7 +26,7 @@ export function SecondLevelDetailsPanel({ category }: SecondLevelDetailsPanelPro
 					<div>
 						<div className='space-y-2'>
 							<div>
-								<div className='text-sm text-gray-500'>Назва (UK):</div>
+								<div className='text-sm text-gray-500'>Назва (UA):</div>
 								<div>{category.name.uk}</div>
 							</div>
 							<div>
@@ -86,57 +84,59 @@ export function SecondLevelDetailsPanel({ category }: SecondLevelDetailsPanelPro
 					Продукти в категорії ({categoryProducts.length})
 				</h3>
 
-				{categoryProducts.length === 0 ? (
-					<div className='bg-gray-200 p-4 rounded text-center text-gray-600'>
-						<p className='mb-6'>Немає продуктів у цій категорії</p>
-						<AdminProductCreate
-							category={category}
-							locale={locale}
+				<div className='space-y-2 mb-4'>
+					<div className='mb-2 flex items-center gap-2'>
+						<UaFlagIcon
+							width={20}
+							height={15}
 						/>
+						Українська мова
 					</div>
-				) : (
-					<div className='space-y-2'>
-						{categoryProducts
+					{categoryProducts.length > 0 ? (
+						categoryProducts
+							?.filter(item => item.locale === 'uk')
 							?.sort((a, b) => b.order - a.order)
 							.map(product => (
-								<div
+								<ProductCard
 									key={product.id}
-									className='bg-white p-3 rounded shadow-sm flex items-center gap-3 hover:bg-gray-50 max-sm:flex-col'
-								>
-									{product.images?.length > 0 && (
-										<div className='w-16 h-16 relative max-sm:w-full max-sm:aspect-square max-sm:h-auto'>
-											<Image
-												src={product.images[0]}
-												alt={product.name}
-												fill
-												className='object-cover rounded'
-											/>
-										</div>
-									)}
-									<div className='flex-grow max-sm:self-start'>
-										<div className='font-medium'>{product.name}</div>
-										<div className='text-xs text-gray-500'>Slug: {product.slug}</div>
-									</div>
-									<div className='text-right mr-4 max-sm:self-start'>
-										<div className='font-bold'>{product.price} ₴</div>
-										<div className='text-xs'>{product.quantity} шт</div>
-									</div>
-									<div className='flex items-center gap-1 max-sm:self-start'>
-										<AdminProductDuplicate
-											productId={product.id}
-											productName={product.name}
-										/>
-										<AdminProductMoveUp productId={product.id} />
-										<AdminProductMoveDown productId={product.id} />
-									</div>
-								</div>
-							))}
-						<AdminProductCreate
-							category={category}
-							locale={locale}
+									product={product}
+								/>
+							))
+					) : (
+						<p className='mb-6'>Немає продуктів у цій категорії</p>
+					)}
+					<AdminProductCreate
+						category={category}
+						locale='uk'
+					/>
+				</div>
+
+				<div className='space-y-2 mb-4'>
+					<div className='mb-2 flex items-center gap-2'>
+						<WhiteFlagIcon
+							width={20}
+							height={15}
 						/>
+						Російська мова
 					</div>
-				)}
+					{categoryProducts.length > 0 ? (
+						categoryProducts
+							?.filter(item => item.locale === 'ru')
+							?.sort((a, b) => b.order - a.order)
+							.map(product => (
+								<ProductCard
+									key={product.id}
+									product={product}
+								/>
+							))
+					) : (
+						<p className='mb-6'>Немає продуктів у цій категорії</p>
+					)}
+					<AdminProductCreate
+						category={category}
+						locale='ru'
+					/>
+				</div>
 			</div>
 		</div>
 	)

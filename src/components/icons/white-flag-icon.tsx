@@ -1,0 +1,33 @@
+export function WhiteFlagIcon({ width = 30, height = 20 }: { width?: number; height?: number }) {
+	return (
+		<svg
+			xmlns='http://www.w3.org/2000/svg'
+			width={width}
+			height={height}
+		>
+			<defs>
+				<linearGradient
+					id='whiteGradient'
+					x1='0%'
+					y1='0%'
+					x2='0%'
+					y2='100%'
+				>
+					<stop
+						offset='0%'
+						stopColor='#f0f0f0'
+					/>
+					<stop
+						offset='100%'
+						stopColor='#ffffff'
+					/>
+				</linearGradient>
+			</defs>
+			<rect
+				width='100%'
+				height='100%'
+				fill='url(#whiteGradient)'
+			/>
+		</svg>
+	)
+}
