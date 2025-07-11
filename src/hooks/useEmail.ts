@@ -8,13 +8,12 @@ export function useContactUs() {
 
 	return useMutation({
 		mutationFn: async (data: { name: string; email: string; message: string }) => {
-			return await emailService.contactUs(data)
+			const res = await emailService.contactUs(data)
+			if (!res.data.ok) throw new Error('Failed to send email')
+			return res.data
 		},
 		onSuccess: () => {
 			toast.success(t('contacts-form-success'))
 		},
-		onError: () => {
-			toast.error(t('contacts-form-error'))
-		}
 	})
 }

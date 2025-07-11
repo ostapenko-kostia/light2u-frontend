@@ -70,6 +70,19 @@ export interface ISlide {
 	updatedAt: Date
 }
 
+export interface IObject {
+	id: number
+	slug: string
+	locale: LOCALE
+	name: string
+	description: string
+	city: string
+	address: string
+	images: string[]
+	createdAt: Date
+	updatedAt: Date
+}
+
 export interface IFile {
 	title: string
 	createdAt: string

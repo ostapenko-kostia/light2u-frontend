@@ -1,4 +1,3 @@
-import { useGetSecondLevelCategories } from '@/hooks/useCategories'
 import { LOCALE } from '@/typing/enums'
 import { IProduct } from '@/typing/interfaces'
 import Image from 'next/image'
@@ -10,15 +9,12 @@ interface ProductDetailsPanelProps {
 }
 
 export function ProductDetailsPanel({ product }: ProductDetailsPanelProps) {
-	const { data: categories } = useGetSecondLevelCategories()
-
 	return (
 		<div className='p-4'>
 			<div className='bg-white p-4 rounded shadow-sm mb-6'>
 				<h3 className='text-lg font-medium mb-3'>Управління продуктом</h3>
 				<div className='flex flex-wrap gap-2'>
 					<AdminProductEdit
-						categories={categories}
 						product={product}
 					/>
 					<AdminProductDelete

@@ -3,7 +3,7 @@
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { useUpdateProduct } from '@/hooks/useProducts'
-import { IProduct, IProductInfo, ISecondLevelCategory } from '@/typing/interfaces'
+import { IProduct, IProductInfo } from '@/typing/interfaces'
 import { ArrowDownIcon, ArrowUpIcon, EditIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -14,34 +14,78 @@ interface Form {
 	price?: number
 	images: FileList
 	description?: string
-	categorySlug?: string
 	locale?: string
 	productInfo: { key: string; value: string }[]
 	quantity?: number
 }
 
 interface Props {
-	categories: ISecondLevelCategory[] | undefined
 	product: IProduct & { info: IProductInfo[] }
 }
 
-export function AdminProductEdit({ categories, product }: Props) {
+export function AdminProductEdit({ product }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
-	const { register, handleSubmit, setValue, control } = useForm<Form>({
+	const { register, handleSubmit, setValue, control, reset } = useForm<Form>({
 		defaultValues: {
+			name: product.name,
+			price: product.price,
+			description: product.description,
+			quantity: product.quantity ?? 0,
 			productInfo: product.info.map(info => ({
 				key: info.key,
 				value: info.value
 			}))
 		}
 	})
-	const { fields, append, remove, move } = useFieldArray({
+	const { fields, append, remove, move, replace } = useFieldArray({
 		control,
 		name: 'productInfo'
 	})
 	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useUpdateProduct()
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
+
+	// Reset form when product changes
+	useEffect(() => {
+		reset({
+			name: product.name,
+			price: product.price,
+			description: product.description,
+			quantity: product.quantity ?? 0,
+			productInfo: product.info.map(info => ({
+				key: info.key,
+				value: info.value
+			}))
+		})
+		replace(
+			product.info.map(info => ({
+				key: info.key,
+				value: info.value
+			}))
+		)
+	}, [product, reset, replace])
+
+	// Reset form when dialog closes
+	useEffect(() => {
+		if (!dialogContextValues?.isOpen) {
+			reset({
+				name: product.name,
+				price: product.price,
+				description: product.description,
+				quantity: product.quantity ?? 0,
+				productInfo: product.info.map(info => ({
+					key: info.key,
+					value: info.value
+				}))
+			})
+			replace(
+				product.info.map(info => ({
+					key: info.key,
+					value: info.value
+				}))
+			)
+		}
+	}, [dialogContextValues?.isOpen, product, reset, replace])
 
 	const edit = async (data: Form) => {
 		data.locale = product.locale
@@ -78,10 +122,6 @@ export function AdminProductEdit({ categories, product }: Props) {
 			closeDialog?.()
 		}
 	}, [isPending, isSuccess, isError])
-
-	const handleCategoryChange = (value: string) => {
-		setValue('categorySlug', value)
-	}
 
 	const addProductInfo = () => {
 		append({ key: '', value: '' })
@@ -135,7 +175,6 @@ export function AdminProductEdit({ categories, product }: Props) {
 					<label htmlFor='name'>Назва</label>
 					<input
 						id='name'
-						defaultValue={product.name}
 						placeholder='Наприклад: Люстра Crystal 5'
 						className='border border-gray-200 rounded-md p-2'
 						{...register('name')}
@@ -147,7 +186,6 @@ export function AdminProductEdit({ categories, product }: Props) {
 					<input
 						id='price'
 						type='number'
-						defaultValue={product.price}
 						placeholder='Наприклад: 2500'
 						className='border border-gray-200 rounded-md p-2'
 						{...register('price', { valueAsNumber: true })}
@@ -159,31 +197,10 @@ export function AdminProductEdit({ categories, product }: Props) {
 					<input
 						id='quantity'
 						type='number'
-						defaultValue={product.quantity ?? 0}
 						placeholder='Наприклад: 2500'
 						className='border border-gray-200 rounded-md p-2'
 						{...register('quantity', { valueAsNumber: true })}
 					/>
-				</div>
-
-				<div className='flex flex-col gap-2'>
-					<label htmlFor='categorySlug'>Категорія</label>
-					<select
-						id='categorySlug'
-						defaultValue={product.categorySlug}
-						onChange={e => handleCategoryChange(e.target.value)}
-						className='border border-gray-200 rounded-md p-2'
-					>
-						<option value=''>Виберіть категорію</option>
-						{categories?.map(category => (
-							<option
-								key={category.id}
-								value={category.slug}
-							>
-								{(category.name as { uk: string }).uk}
-							</option>
-						))}
-					</select>
 				</div>
 
 				<div className='flex flex-col gap-4'>
@@ -236,13 +253,11 @@ export function AdminProductEdit({ categories, product }: Props) {
 									<input
 										placeholder='Назва поля'
 										className='border border-gray-200 rounded-md p-2'
-										defaultValue={field.key}
 										{...register(`productInfo.${index}.key`)}
 									/>
 									<input
 										placeholder='Значення'
 										className='border border-gray-200 rounded-md p-2'
-										defaultValue={field.value}
 										{...register(`productInfo.${index}.value`)}
 									/>
 								</div>
@@ -263,9 +278,8 @@ export function AdminProductEdit({ categories, product }: Props) {
 					<label htmlFor='description'>Опис</label>
 					<textarea
 						id='description'
-						defaultValue={product.description}
 						placeholder='Опишіть товар детально...'
-						className='border border-gray-200 rounded-md p-2'
+						className='border border-gray-200 rounded-md p-2 min-h-[150px]'
 						{...register('description')}
 					/>
 				</div>

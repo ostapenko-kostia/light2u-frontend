@@ -21,7 +21,9 @@ export async function HomeCategories({
 			transition={{ duration: 0.7, ease: 'anticipate' }}
 		>
 			<Container>
-				<h2 className='text-xl uppercase tracking-wide'>{t('home-categories-title')}</h2>
+				<header className='text-center mb-12'>
+					<h2 className='text-3xl font-bold text-gray-900 mb-4'>{t('home-categories-title')}</h2>
+				</header>
 				<section className='grid grid-cols-4 gap-8 w-full pt-6 max-xl:grid-cols-3 max-md:grid-cols-2 max-[350px]:!grid-cols-1'>
 					{categories?.map(category => (
 						<article
@@ -32,7 +34,7 @@ export async function HomeCategories({
 								href={`/catalog?firstLevelCategory=${category.slug}`}
 								className='w-full h-full flex flex-col gap-3'
 							>
-								<div className='relative w-full h-full rounded-sm aspect-square overflow-hidden'>
+								<div className='relative w-full h-full rounded-2xl aspect-square overflow-hidden'>
 									<Image
 										src={category.image}
 										alt={(category.name as any)[locale]}

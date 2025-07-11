@@ -4,7 +4,7 @@ import { Container } from '../layout/container'
 
 export function ContactsInfo({ t }: { t: (key: string) => string }) {
 	return (
-		<Container className='grid grid-cols-1 md:grid-cols-3 gap-8 mb-16'>
+		<Container className='grid grid-cols-1 md:grid-cols-3 gap-8 my-16'>
 			{/* Phone */}
 			<motion.div
 				className='bg-gray-50 p-8 rounded-lg text-center hover:shadow-md transition-shadow'

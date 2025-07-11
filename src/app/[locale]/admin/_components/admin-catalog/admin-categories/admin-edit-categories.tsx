@@ -23,7 +23,14 @@ interface Form {
 
 export function AdminEditCategory({ category }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
-	const { register, handleSubmit, setValue } = useForm<Form>()
+	const { register, handleSubmit, setValue, reset } = useForm<Form>({
+		defaultValues: {
+			name: {
+				uk: (category.name as { uk: string }).uk,
+				ru: (category.name as { ru: string }).ru
+			}
+		}
+	})
 	const {
 		mutateAsync: editFirstLevelFunc,
 		isPending: isFirstLevelPending,
@@ -42,6 +49,28 @@ export function AdminEditCategory({ category }: Props) {
 	const isPending = isFirstLevelPending || isSecondLevelPending
 	const isSuccess = isFirstLevelSuccess || isSecondLevelSuccess
 	const isError = isFirstLevelError || isSecondLevelError
+
+	// Reset form when category changes
+	useEffect(() => {
+		reset({
+			name: {
+				uk: (category.name as { uk: string }).uk,
+				ru: (category.name as { ru: string }).ru
+			}
+		})
+	}, [category, reset])
+
+	// Reset form when dialog closes
+	useEffect(() => {
+		if (!dialogContextValues?.isOpen) {
+			reset({
+				name: {
+					uk: (category.name as { uk: string }).uk,
+					ru: (category.name as { ru: string }).ru
+				}
+			})
+		}
+	}, [dialogContextValues?.isOpen, category, reset])
 
 	useEffect(() => {
 		if (isPending) {
@@ -117,7 +146,6 @@ export function AdminEditCategory({ category }: Props) {
 						type='text'
 						placeholder='Категорія'
 						id='nameUk'
-						defaultValue={(category.name as { uk: string }).uk}
 						{...register('name.uk')}
 					/>
 				</div>
@@ -131,7 +159,6 @@ export function AdminEditCategory({ category }: Props) {
 					<input
 						className='w-full rounded-md border border-gray-500 bg-white px-5 py-3 text-sm placeholder:text-gray-400 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
 						type='text'
-						defaultValue={(category.name as { ru: string }).ru}
 						placeholder='Категорія'
 						id='nameRu'
 						{...register('name.ru')}

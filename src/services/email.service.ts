@@ -2,7 +2,7 @@ import { api } from '@/lib/axios'
 
 class EmailService {
 	async contactUs(data: { name: string; email: string; message: string }) {
-		return api.post('/email/contact-us', data)
+		return api.post<{ ok: boolean }>('/email/contact-us', data)
 	}
 }
 

@@ -17,9 +17,9 @@ export default async function ContactsPage({ params }: { params: Promise<{ local
 		<div className='min-h-screen'>
 			<ContactsHero t={t} />
 			<ContactsInfo t={t} />
-			<Container className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+			<Container className='grid grid-cols-1 md:grid-cols-2 gap-8 mb-8'>
 				<ContactsMap t={t} />
-				<ContactForm t={t} />
+				<ContactForm />
 			</Container>
 			<ContactsHours t={t} />
 			<ContactsCta t={t} />

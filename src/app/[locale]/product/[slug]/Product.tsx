@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 export function Product({ product }: { product: IProduct }) {
 	const { t } = useTranslation()
+	console.log(product.info.sort((a, b) => b.order - a.order))
 
 	return (
 		<>
@@ -39,16 +40,18 @@ export function Product({ product }: { product: IProduct }) {
 						{t('product-info-title')}
 					</h3>
 					<ul className='flex flex-col gap-4 items-start text-start justify-start max-[500px]:!text-sm'>
-						{product.info &&
-							product.info.map(i => (
-								<li
-									key={i.key}
-									className='flex items-start justify-start gap-2'
-								>
-									<span className='font-medium text-[#121212BF]'>{i.key}:</span>
-									<span className='font-light'>{i.value}</span>
-								</li>
-							))}
+						{!!product.info &&
+							product.info
+								.sort((a, b) => a.order - b.order)
+								.map((i, index) => (
+									<li
+										key={index}
+										className='flex items-start justify-start gap-2'
+									>
+										<span className='font-medium text-[#121212BF]'>{i.key}:</span>
+										<span className='font-light'>{i.value}</span>
+									</li>
+								))}
 					</ul>
 				</>
 			)}

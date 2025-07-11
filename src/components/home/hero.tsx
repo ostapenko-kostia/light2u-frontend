@@ -31,7 +31,11 @@ export function Hero({ slides }: { slides: ISlide[] | undefined }) {
 						<div className='absolute w-1/2 h-full inset-0 top-0 left-1/2 -z-10'>
 							<div className='relative w-full h-full inset-0 top-0 left-0'>
 								<Image
-									src={slide.background}
+									src={
+										!!slide.background && slide.background?.length > 0
+											? slide.background
+											: '/placeholder.svg'
+									}
 									alt={slide.text}
 									fill
 									sizes='100%, 100%'

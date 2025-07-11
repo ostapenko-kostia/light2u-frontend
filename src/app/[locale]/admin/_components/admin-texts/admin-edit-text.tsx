@@ -19,11 +19,31 @@ interface Form {
 
 function AdminEditTextComponent({ text }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
-	const { register, handleSubmit, watch, setValue } = useForm<Form>()
+	const { register, handleSubmit, watch, setValue, reset } = useForm<Form>({
+		defaultValues: {
+			text: text.text
+		}
+	})
 	const queryClient = useQueryClient()
 	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useEditText()
 	const dialogContextValues = useContext(DialogContext)
 	const closeDialog = dialogContextValues?.closeDialog
+
+	// Reset form when text changes
+	useEffect(() => {
+		reset({
+			text: text.text
+		})
+	}, [text, reset])
+
+	// Reset form when dialog closes
+	useEffect(() => {
+		if (!dialogContextValues?.isOpen) {
+			reset({
+				text: text.text
+			})
+		}
+	}, [dialogContextValues?.isOpen, text, reset])
 
 	useEffect(() => {
 		if (isPending) {
@@ -70,7 +90,6 @@ function AdminEditTextComponent({ text }: Props) {
 						type='text'
 						required
 						placeholder={text.text}
-						defaultValue={text.text}
 						id='text'
 						{...register('text', { required: true })}
 					/>

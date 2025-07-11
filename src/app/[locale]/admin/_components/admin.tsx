@@ -16,6 +16,8 @@ import { AdminCatalogTab } from './admin-catalog/admin-catalog'
 import clsx from 'clsx'
 import { Dialog } from '@/components/ui/dialog'
 import { MenuIcon } from 'lucide-react'
+import { AdminObjectsTab } from './admin-objects/admin-objects'
+import { useGetObjects } from '@/hooks/useObjects'
 
 const Navigation = ({
 	className,
@@ -82,6 +84,18 @@ const Navigation = ({
 
 			<button
 				onClick={() => {
+					setActiveTab('objects')
+					setIsCatalogOpen(false)
+				}}
+				className={`px-4 py-2 rounded-md ${
+					activeTab === 'objects' ? 'bg-white text-blue-900' : 'hover:bg-blue-700'
+				}`}
+			>
+				Об'єкти
+			</button>
+
+			<button
+				onClick={() => {
 					setActiveTab('texts')
 					setIsCatalogOpen(false)
 				}}
@@ -115,6 +129,7 @@ function AdminComponent() {
 	const { data: admins } = useGetAdmins()
 	const { data: files } = useGetFiles()
 	const { data: slides } = useGetSlides()
+	const { data: objects } = useGetObjects()
 
 	const [activeTab, setActiveTab] = useState('catalog')
 
@@ -137,6 +152,8 @@ function AdminComponent() {
 				return <AdminTextFieldsTab texts={texts || []} />
 			case 'storage':
 				return <AdminStorageControlTab files={files || []} />
+			case 'objects':
+				return <AdminObjectsTab objects={objects || []} />
 			default:
 				return (
 					<div className='p-8 text-center'>
@@ -156,14 +173,14 @@ function AdminComponent() {
 							<h1 className='text-xl font-bold'>Адмін Панель</h1>
 						</div>
 						<Navigation
-							className='max-lg:hidden'
+							className='max-xl:hidden'
 							activeTab={activeTab}
 							setActiveTab={setActiveTab}
 						/>
 						<Dialog
 							title='Адміністративне меню'
 							trigger={
-								<button className='lg:hidden'>
+								<button className='xl:hidden'>
 									<MenuIcon />
 								</button>
 							}

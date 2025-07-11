@@ -16,6 +16,7 @@ const textGroups = {
 	product: 'Сторінка товару',
 	about: 'Про нас',
 	contacts: 'Контакти',
+	object: 'Сторінка об’єкту',
 	other: 'Інше'
 }
 

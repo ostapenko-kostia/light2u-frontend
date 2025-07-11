@@ -3,8 +3,8 @@
 import { Dialog, DialogContext } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { Textarea } from '@/components/ui/textarea'
-import { useUpdateSlide } from '@/hooks/useSlides'
-import { ISlide } from '@/typing/interfaces'
+import { useUpdateObject } from '@/hooks/useObjects'
+import { IObject } from '@/typing/interfaces'
 import { useQueryClient } from '@tanstack/react-query'
 import { EditIcon } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
@@ -12,64 +12,65 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 interface Form {
-	background?: FileList
-	text?: string
-	url?: string
-	description?: string
-	locale?: string
+	images: FileList
+	name: string
+	description: string
+	city: string
+	address: string
 }
 
 interface Props {
-	slide: ISlide
+	object: IObject
 }
 
-export function AdminSlideEdit({ slide }: Props) {
+export function AdminObjectEdit({ object }: Props) {
 	const [loadingToastId, setLoadingToastId] = useState('')
 	const queryClient = useQueryClient()
 	const { register, handleSubmit, setValue, reset } = useForm<Form>({
 		defaultValues: {
-			background: undefined,
-			text: slide.text,
-			url: slide.url,
-			description: slide.description,
-			locale: slide.locale
+			images: undefined,
+			name: object.name,
+			description: object.description,
+			city: object.city,
+			address: object.address
 		}
 	})
-	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useUpdateSlide()
+	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useUpdateObject()
 	const dialogContextValues = useContext(DialogContext)
 
-	// Reset form when slide changes
+	// Reset form when object changes
 	useEffect(() => {
 		reset({
-			background: undefined,
-			text: slide.text,
-			url: slide.url,
-			description: slide.description,
-			locale: slide.locale
+			images: undefined,
+			name: object.name,
+			description: object.description,
+			city: object.city,
+			address: object.address
 		})
-	}, [slide, reset])
+	}, [object, reset])
 
 	// Reset form when dialog closes
 	useEffect(() => {
 		if (!dialogContextValues?.isOpen) {
 			reset({
-				background: undefined,
-				text: slide.text,
-				url: slide.url,
-				description: slide.description,
-				locale: slide.locale
+				images: undefined,
+				name: object.name,
+				description: object.description,
+				city: object.city,
+				address: object.address
 			})
 		}
-	}, [dialogContextValues?.isOpen, slide, reset])
+	}, [dialogContextValues?.isOpen, object, reset])
 
 	const edit = async (data: Form) => {
 		await editFunc({
-			id: slide.id,
+			id: object.id,
 			data: {
-				url: data.url ?? slide.url,
-				text: data.text ?? slide.text,
-				description: data.description ?? slide.description,
-				background: data.background ?? undefined
+				images: data.images ?? object.images,
+				name: data.name ?? object.name,
+				description: data.description ?? object.description,
+				city: data.city ?? object.city,
+				address: data.address ?? object.address
 			}
 		})
 	}
@@ -81,8 +82,8 @@ export function AdminSlideEdit({ slide }: Props) {
 		}
 		if (isSuccess) {
 			loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['slides get'] })
-			toast.success('Слайд успішно змінено!')
+			queryClient.invalidateQueries({ queryKey: ['objects get'] })
+			toast.success("Об'єкт успішно змінено!")
 		}
 		if (isError) {
 			loadingToastId && toast.dismiss(loadingToastId)
@@ -91,7 +92,7 @@ export function AdminSlideEdit({ slide }: Props) {
 
 	return (
 		<Dialog
-			title='Змінити слайд'
+			title="Змінити об'єкт"
 			trigger={
 				<button>
 					<EditIcon />
@@ -111,43 +112,61 @@ export function AdminSlideEdit({ slide }: Props) {
 					</label>
 					<FileInput
 						className='w-full appearance-none rounded-md border border-[#ccc] bg-white text-[#333] placeholder:text-[#808080] px-3 py-3 text-sm focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500'
-						multiple={false}
-						onChange={file => {
-							if (file) {
-								setValue('background', file)
+						multiple
+						onChange={files => {
+							if (files) {
+								setValue('images', files)
 							}
 						}}
 					/>
 				</div>
 				<div className='flex items-start flex-col gap-2'>
 					<label
-						htmlFor='text'
+						htmlFor='name'
 						className='flex items-center gap-2'
 					>
-						Текст
+						Назва
 					</label>
 					<input
 						className='w-full rounded-md border border-[#ccc] bg-white h-10 text-[#333] placeholder:text-[#808080] px-3 py-3 text-sm focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
 						type='text'
-						placeholder='Слайд'
-						id='text'
-						{...register('text')}
+						required
+						placeholder="Об'єкт"
+						id='name'
+						{...register('name', { required: true })}
 					/>
 				</div>
-
 				<div className='flex items-start flex-col gap-2'>
 					<label
-						htmlFor='url'
+						htmlFor='city'
 						className='flex items-center gap-2'
 					>
-						Посилання
+						Місто
 					</label>
 					<input
 						className='w-full rounded-md border border-[#ccc] bg-white h-10 text-[#333] placeholder:text-[#808080] px-3 py-3 text-sm focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
-						type='url'
-						placeholder='https://example.com'
-						id='url'
-						{...register('url')}
+						type='text'
+						required
+						placeholder='Київ'
+						id='city'
+						{...register('city', { required: true })}
+					/>
+				</div>
+
+				<div className='flex items-start flex-col gap-2'>
+					<label
+						htmlFor='address'
+						className='flex items-center gap-2'
+					>
+						Адреса
+					</label>
+					<input
+						className='w-full rounded-md border border-[#ccc] bg-white h-10 text-[#333] placeholder:text-[#808080] px-3 py-3 text-sm focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'
+						type='text'
+						required
+						placeholder='вул. Хрещатик, 1'
+						id='address'
+						{...register('address', { required: true })}
 					/>
 				</div>
 
@@ -156,7 +175,7 @@ export function AdminSlideEdit({ slide }: Props) {
 						htmlFor='url'
 						className='flex items-center gap-2'
 					>
-						Опис <span className='text-red-400'>*</span>
+						Опис
 					</label>
 					<Textarea
 						className='w-full min-h-[200px] rounded-md border border-[#ccc] bg-white h-10 text-[#333] placeholder:text-[#808080] px-3 py-3 text-sm resize-y focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500;'

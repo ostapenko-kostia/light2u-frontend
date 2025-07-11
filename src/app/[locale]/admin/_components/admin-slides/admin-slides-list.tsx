@@ -24,7 +24,7 @@ export function AdminSlidesList({ slides, locale }: Props) {
 					<div>
 						<div className='relative w-full aspect-square'>
 							<Image
-								src={slide.background}
+								src={!!slide.background.length ? slide.background : '/placeholder.svg'}
 								alt={slide.text}
 								fill
 								sizes='100%, 100%'
