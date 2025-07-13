@@ -1,10 +1,8 @@
 'use client'
 
 import { useAdminAuth } from '@/hooks/useAdmin'
-import { LockIcon, MailIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Loader2, LockIcon, MailIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 interface Form {
 	email: string
@@ -12,30 +10,20 @@ interface Form {
 }
 
 export function AdminLogin() {
-	const [loadingToastId, setLoadingToastId] = useState('')
-	const { register, handleSubmit } = useForm<Form>()
-	const { mutateAsync: authFunc, isPending, isSuccess, isError } = useAdminAuth()
-
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває авторизація...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			toast.success('Успішно авторизовано!')
-			setTimeout(() => window.location.reload(), 500)
-		}
-		if (isError) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-		}
-	}, [isPending, isSuccess, isError])
+	const { register, handleSubmit, reset } = useForm<Form>()
+	const { mutateAsync: authFunc, isPending } = useAdminAuth()
 
 	return (
 		<div className='min-h-[88vh] animation-opacity'>
 			<form
 				className='mx-auto bg-white rounded-md p-4 w-[400px] mt-10 h-min flex flex-col gap-8 max-sm:w-[90%]'
-				onSubmit={handleSubmit(data => authFunc(data))}
+				onSubmit={handleSubmit(async data => {
+					try {
+						await authFunc(data)
+						reset()
+						window.location.reload()
+					} catch {}
+				})}
 			>
 				<h2 className='text-center font-semibold text-3xl'>Вхід</h2>
 				<div className='flex items-start flex-col gap-3'>
@@ -72,9 +60,10 @@ export function AdminLogin() {
 				</div>
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+					disabled={isPending}
 				>
-					Увійти
+					{isPending ? <Loader2 className='animate-spin' /> : 'Увійти'}
 				</button>
 			</form>
 		</div>
