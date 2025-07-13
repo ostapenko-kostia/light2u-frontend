@@ -6,8 +6,10 @@ class FileService {
 		return await api.delete(`/storage/${title}`)
 	}
 
-	async createFile(data: FormData) {
-		return await api.post(`/storage`, data, {
+	async createFile(file: FileList) {
+		const formData = new FormData()
+		formData.append('file', file[0])
+		return await api.post(`/storage`, formData, {
 			headers: { 'Content-Type': 'multipart/form-data' }
 		})
 	}

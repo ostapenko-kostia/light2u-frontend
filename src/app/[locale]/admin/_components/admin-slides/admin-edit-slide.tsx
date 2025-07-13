@@ -1,15 +1,13 @@
 'use client'
 
-import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { Textarea } from '@/components/ui/textarea'
 import { useUpdateSlide } from '@/hooks/useSlides'
 import { ISlide } from '@/typing/interfaces'
-import { useQueryClient } from '@tanstack/react-query'
-import { EditIcon } from 'lucide-react'
-import { useContext, useEffect, useState } from 'react'
+import { EditIcon, Loader2 } from 'lucide-react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 interface Form {
 	background?: FileList
@@ -24,8 +22,6 @@ interface Props {
 }
 
 export function AdminSlideEdit({ slide }: Props) {
-	const [loadingToastId, setLoadingToastId] = useState('')
-	const queryClient = useQueryClient()
 	const { register, handleSubmit, setValue, reset } = useForm<Form>({
 		defaultValues: {
 			background: undefined,
@@ -35,10 +31,8 @@ export function AdminSlideEdit({ slide }: Props) {
 			locale: slide.locale
 		}
 	})
-	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useUpdateSlide()
-	const dialogContextValues = useContext(DialogContext)
+	const { mutateAsync: editFunc, isPending } = useUpdateSlide()
 
-	// Reset form when slide changes
 	useEffect(() => {
 		reset({
 			background: undefined,
@@ -48,19 +42,6 @@ export function AdminSlideEdit({ slide }: Props) {
 			locale: slide.locale
 		})
 	}, [slide, reset])
-
-	// Reset form when dialog closes
-	useEffect(() => {
-		if (!dialogContextValues?.isOpen) {
-			reset({
-				background: undefined,
-				text: slide.text,
-				url: slide.url,
-				description: slide.description,
-				locale: slide.locale
-			})
-		}
-	}, [dialogContextValues?.isOpen, slide, reset])
 
 	const edit = async (data: Form) => {
 		await editFunc({
@@ -74,21 +55,6 @@ export function AdminSlideEdit({ slide }: Props) {
 		})
 	}
 
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває зміна...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['slides get'] })
-			toast.success('Слайд успішно змінено!')
-		}
-		if (isError) {
-			loadingToastId && toast.dismiss(loadingToastId)
-		}
-	}, [isPending, isSuccess, isError])
-
 	return (
 		<Dialog
 			title='Змінити слайд'
@@ -100,7 +66,11 @@ export function AdminSlideEdit({ slide }: Props) {
 		>
 			<form
 				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-4'
-				onSubmit={handleSubmit(data => edit(data))}
+				onSubmit={handleSubmit(async data => {
+					try {
+						await edit(data)
+					} catch {}
+				})}
 			>
 				<div>
 					<label
@@ -169,9 +139,10 @@ export function AdminSlideEdit({ slide }: Props) {
 
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+					disabled={isPending}
 				>
-					Змінити
+					{isPending ? <Loader2 className='animate-spin' /> : 'Змінити'}
 				</button>
 			</form>
 		</Dialog>

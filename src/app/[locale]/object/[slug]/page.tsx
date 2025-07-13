@@ -13,5 +13,9 @@ export default async function ObjectPage({
 
 	if (!object || object.locale !== locale) notFound()
 
-	return <Object object={object} />
+	return (
+		<section className='animation-opacity'>
+			<Object object={object} />
+		</section>
+	)
 }

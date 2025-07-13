@@ -1,5 +1,6 @@
 import { adminService } from '@/services/admin.service'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 export function useGetAdmins() {
 	return useQuery({
@@ -10,34 +11,43 @@ export function useGetAdmins() {
 }
 
 export function useAdminAuth() {
+	const queryClient = useQueryClient()
+
 	return useMutation({
-		mutationKey: ['admin auth'],
 		mutationFn: async ({ email, password }: { email: string; password: string }) => {
-			const res = await adminService.auth(email, password)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await adminService.auth(email, password)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['admins get'] })
+			toast.success('Успішно')
 		}
 	})
 }
 
 export function useAdminCreate() {
+	const queryClient = useQueryClient()
+
 	return useMutation({
-		mutationKey: ['admin create'],
 		mutationFn: async ({ email, password }: { email: string; password: string }) => {
-			const res = await adminService.createAdmin(email, password)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await adminService.createAdmin(email, password)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['admins get'] })
+			toast.success('Успішно створено')
 		}
 	})
 }
 
 export function useAdminDelete() {
+	const queryClient = useQueryClient()
+
 	return useMutation({
-		mutationKey: ['admin delete'],
 		mutationFn: async ({ id }: { id: number }) => {
-			const res = await adminService.deleteAdmin(id)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await adminService.deleteAdmin(id)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['admins get'] })
+			toast.success('Успішно видалено')
 		}
 	})
 }

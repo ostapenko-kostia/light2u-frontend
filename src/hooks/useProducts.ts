@@ -1,21 +1,6 @@
-import { productsService } from '@/services/products.service'
-import { useMutation, useQuery } from '@tanstack/react-query'
-
-interface ProductInfoInput {
-	key: string
-	value: string
-}
-
-interface BaseProductData {
-	name: string
-	price: number
-	images: FileList
-	description: string
-	categorySlug: string
-	locale: string
-	productInfo: ProductInfoInput[]
-	quantity: number
-}
+import { BaseProductData, productsService } from '@/services/products.service'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 export const useGetProducts = () => {
 	return useQuery({
@@ -26,80 +11,79 @@ export const useGetProducts = () => {
 }
 
 export const useDeleteProduct = () => {
+	const queryClient = useQueryClient()
 	return useMutation({
 		mutationFn: async ({ id }: { id: number }) => {
-			const res = await productsService.deleteProduct(id)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await productsService.deleteProduct(id)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['products get'] })
+			toast.success('Успішно видалено')
 		}
 	})
 }
 
 export const useCreateProduct = () => {
+	const queryClient = useQueryClient()
 	return useMutation({
 		mutationFn: async (data: BaseProductData) => {
-			const formData = new FormData()
-
-			Array.from(data.images).forEach(el => {
-				formData.append('images', el)
-			})
-			const { images, ...dataWithoutImages } = data
-			formData.append('productInfo', JSON.stringify(dataWithoutImages))
-
-			const res = await productsService.createProduct(formData)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await productsService.createProduct(data)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['products get'] })
+			toast.success('Успішно створено')
 		}
 	})
 }
 
 export const useUpdateProduct = () => {
+	const queryClient = useQueryClient()
 	return useMutation({
 		mutationFn: async ({ id, data }: { id: number; data: Partial<BaseProductData> }) => {
-			const formData = new FormData()
-
-			if (data.images) {
-				Array.from(data.images).forEach(el => {
-					formData.append('images', el)
-				})
-			}
-
-			const { images, ...dataWithoutImages } = data
-			formData.append('productInfo', JSON.stringify(dataWithoutImages))
-
-			const res = await productsService.updateProduct(id, formData)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await productsService.updateProduct({ id, data })
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['products get'] })
+			toast.success('Успішно оновлено')
 		}
 	})
 }
 
 export const useDuplicateProduct = () => {
+	const queryClient = useQueryClient()
 	return useMutation({
 		mutationFn: async ({ id }: { id: number }) => {
-			const res = await productsService.duplicateProduct(id)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await productsService.duplicateProduct(id)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['products get'] })
+			toast.success('Успішно дубльовано')
 		}
 	})
 }
 
 export const useMoveProductUp = () => {
+	const queryClient = useQueryClient()
 	return useMutation({
 		mutationFn: async ({ id }: { id: number }) => {
-			const res = await productsService.moveProductUp(id)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await productsService.moveProductUp(id)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['products get'] })
+			toast.success('Успішно переміщено вгору')
 		}
 	})
 }
 
 export const useMoveProductDown = () => {
+	const queryClient = useQueryClient()
 	return useMutation({
 		mutationFn: async ({ id }: { id: number }) => {
-			const res = await productsService.moveProductDown(id)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await productsService.moveProductDown(id)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['products get'] })
+			toast.success('Успішно переміщено вниз')
 		}
 	})
 }

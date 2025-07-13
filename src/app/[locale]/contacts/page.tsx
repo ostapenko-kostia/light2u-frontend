@@ -14,7 +14,7 @@ export default async function ContactsPage({ params }: { params: Promise<{ local
 	const { t } = await getServerTranslation(locale)
 
 	return (
-		<div className='min-h-screen'>
+		<div className='min-h-screen animation-opacity'>
 			<ContactsHero t={t} />
 			<ContactsInfo t={t} />
 			<Container className='grid grid-cols-1 md:grid-cols-2 gap-8 mb-8'>

@@ -1,13 +1,10 @@
 'use client'
 
-import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { useCreateSecondLevelCategory } from '@/hooks/useCategories'
-import { useQueryClient } from '@tanstack/react-query'
-import { PlusIcon } from 'lucide-react'
-import { useContext, useEffect, useState } from 'react'
+import { Loader2, PlusIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 interface Form {
 	image: FileList
@@ -20,34 +17,8 @@ interface Props {
 }
 
 export function AdminCreateSecondLevelCategory({ parentCategorySlug }: Props) {
-	const [loadingToastId, setLoadingToastId] = useState('')
-	const { register, handleSubmit, setValue } = useForm<Form>()
-	const queryClient = useQueryClient()
-	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useCreateSecondLevelCategory()
-
-	const dialogContextValues = useContext(DialogContext)
-	const closeDialog = dialogContextValues?.closeDialog
-
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває створення...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['categories get'] })
-			toast.success('Підкатегорію успішно створено!')
-			closeDialog?.()
-		}
-		if (isError) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			closeDialog?.()
-		}
-	}, [isPending, isSuccess, isError])
-
-	const onSubmit = (data: Form) => {
-		createFunc({ ...data, parentCategorySlug })
-	}
+	const { register, handleSubmit, setValue, reset } = useForm<Form>()
+	const { mutateAsync: createFunc, isPending } = useCreateSecondLevelCategory()
 
 	return (
 		<Dialog
@@ -60,7 +31,12 @@ export function AdminCreateSecondLevelCategory({ parentCategorySlug }: Props) {
 		>
 			<form
 				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-8'
-				onSubmit={handleSubmit(onSubmit)}
+				onSubmit={handleSubmit(async data => {
+					try {
+						await createFunc({ ...data, parentCategorySlug })
+						reset()
+					} catch {}
+				})}
 			>
 				<div>
 					<FileInput
@@ -108,9 +84,10 @@ export function AdminCreateSecondLevelCategory({ parentCategorySlug }: Props) {
 				</div>
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+					disabled={isPending}
 				>
-					Створити
+					{isPending ? <Loader2 className='animate-spin' /> : 'Створити'}
 				</button>
 			</form>
 		</Dialog>

@@ -1,5 +1,6 @@
 import { categoriesService } from '@/services/categories.service'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 export function useGetFirstLevelCategories() {
 	return useQuery({
@@ -19,13 +20,11 @@ export function useCreateFirstLevelCategory() {
 	const queryClient = useQueryClient()
 	return useMutation({
 		mutationFn: (data: { nameUk: string; nameRu: string; image: FileList }) => {
-			const formData = new FormData()
-			formData.append('name', JSON.stringify({ uk: data.nameUk, ru: data.nameRu }))
-			formData.append('image', data.image[0])
-			return categoriesService.createFirstLevelCategory(formData)
+			return categoriesService.createFirstLevelCategory(data)
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['categories get first level'] })
+			toast.success('Успішно створено')
 		}
 	})
 }
@@ -33,15 +32,17 @@ export function useCreateFirstLevelCategory() {
 export function useCreateSecondLevelCategory() {
 	const queryClient = useQueryClient()
 	return useMutation({
-		mutationFn: (data: { nameUk: string; nameRu: string; image: FileList; parentCategorySlug: string }) => {	
-			const formData = new FormData()
-			formData.append('name', JSON.stringify({ uk: data.nameUk, ru: data.nameRu }))
-			formData.append('image', data.image[0])
-			formData.append('parentCategorySlug', data.parentCategorySlug)
-			return categoriesService.createSecondLevelCategory(formData)
+		mutationFn: (data: {
+			nameUk: string
+			nameRu: string
+			image: FileList
+			parentCategorySlug: string
+		}) => {
+			return categoriesService.createSecondLevelCategory(data)
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['categories get second level'] })
+			toast.success('Успішно створено')
 		}
 	})
 }
@@ -53,6 +54,7 @@ export function useEditFirstLevelCategory() {
 			categoriesService.editFirstLevelCategory(data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['categories get first level'] })
+			toast.success('Успішно оновлено')
 		}
 	})
 }
@@ -69,6 +71,7 @@ export function useEditSecondLevelCategory() {
 		}) => categoriesService.editSecondLevelCategory(data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['categories get second level'] })
+			toast.success('Успішно оновлено')
 		}
 	})
 }
@@ -79,6 +82,7 @@ export function useDeleteFirstLevelCategory() {
 		mutationFn: (id: number) => categoriesService.deleteFirstLevelCategory(id),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['categories get first level'] })
+			toast.success('Успішно видалено')
 		}
 	})
 }
@@ -89,6 +93,7 @@ export function useDeleteSecondLevelCategory() {
 		mutationFn: (id: number) => categoriesService.deleteSecondLevelCategory(id),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['categories get second level'] })
+			toast.success('Успішно видалено')
 		}
 	})
 }

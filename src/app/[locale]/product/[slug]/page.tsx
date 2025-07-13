@@ -36,7 +36,7 @@ export default async function ProductPage({
 		<motion.section
 			initial={{ translateY: '15px', opacity: 0 }}
 			animate={{ translateY: '0px', opacity: 1 }}
-			transition={{ duration: 0.7, ease: 'anticipate' }}
+			transition={{ duration: 1, ease: 'anticipate' }}
 			className='py-12'
 		>
 			<Container className='grid grid-cols-[1.3fr_1fr] max-lg:grid-cols-2 max-md:grid-cols-1 gap-10'>

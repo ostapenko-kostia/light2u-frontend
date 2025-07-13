@@ -4,11 +4,9 @@ import { Dialog } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateSlide } from '@/hooks/useSlides'
-import { useQueryClient } from '@tanstack/react-query'
-import { PlusCircleIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Loader2, PlusCircleIcon } from 'lucide-react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 interface Form {
 	background: FileList
@@ -23,29 +21,10 @@ interface Props {
 }
 
 export function AdminSlideCreate({ locale }: Props) {
-	const [loadingToastId, setLoadingToastId] = useState('')
-	const queryClient = useQueryClient()
 	const { register, handleSubmit, setValue } = useForm<Form>()
-	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useCreateSlide()
+	const { mutateAsync: createFunc, isPending } = useCreateSlide()
 
-	useEffect(() => {
-		setValue('locale', locale)
-	}, [locale, setValue])
-
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває створення...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['slides get'] })
-			toast.success('Слайд успішно створено!')
-		}
-		if (isError) {
-			loadingToastId && toast.dismiss(loadingToastId)
-		}
-	}, [isPending, isSuccess, isError])
+	useEffect(() => setValue('locale', locale), [locale, setValue])
 
 	return (
 		<Dialog
@@ -62,7 +41,11 @@ export function AdminSlideCreate({ locale }: Props) {
 		>
 			<form
 				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-4'
-				onSubmit={handleSubmit(data => createFunc(data))}
+				onSubmit={handleSubmit(async data => {
+					try {
+						await createFunc(data)
+					} catch {}
+				})}
 			>
 				<div>
 					<label
@@ -133,9 +116,10 @@ export function AdminSlideCreate({ locale }: Props) {
 
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+					disabled={isPending}
 				>
-					Створити
+					{isPending ? <Loader2 className='animate-spin' /> : 'Створити'}
 				</button>
 			</form>
 		</Dialog>

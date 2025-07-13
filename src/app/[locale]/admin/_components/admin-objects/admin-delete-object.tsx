@@ -2,34 +2,14 @@
 
 import { Dialog } from '@/components/ui/dialog'
 import { useDeleteObject } from '@/hooks/useObjects'
-import { useQueryClient } from '@tanstack/react-query'
-import { Trash2Icon } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { Loader2, Trash2Icon } from 'lucide-react'
 
 interface Props {
 	id: number
 }
 
 export function AdminDeleteObject({ id }: Props) {
-	const [loadingToastId, setLoadingToastId] = useState('')
-	const queryClient = useQueryClient()
-	const { mutateAsync: deleteFunc, isPending, isSuccess, isError } = useDeleteObject()
-
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває видалення...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['objects get'] })
-			toast.success('Об\'єкт успішно видалено!')
-		}
-		if (isError) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-		}
-	}, [isPending, isSuccess, isError])
+	const { mutateAsync: deleteFunc, isPending } = useDeleteObject()
 
 	return (
 		<Dialog
@@ -44,10 +24,15 @@ export function AdminDeleteObject({ id }: Props) {
 				<span className='text-lg'>Ви впевнені, що хочете видалити цей об'єкт?</span>
 				<div className='flex items-center gap-4 ml-auto'>
 					<button
-						onClick={() => deleteFunc(id)}
-						className='bg-gray-800 text-white w-min px-12 py-2 self-end rounded-md hover:bg-gray-700'
+						onClick={async () => {
+							try {
+								await deleteFunc(id)
+							} catch {}
+						}}
+						className='bg-gray-800 text-white w-min px-12 py-2 self-end rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+						disabled={isPending}
 					>
-						Так
+						{isPending ? <Loader2 className='animate-spin' /> : 'Так'}
 					</button>
 				</div>
 			</div>

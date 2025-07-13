@@ -1,5 +1,6 @@
 import { slideService } from '@/services/slides.service'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 export function useGetSlides() {
 	return useQuery({
@@ -10,73 +11,58 @@ export function useGetSlides() {
 }
 
 export function useDeleteSlide() {
+	const queryClient = useQueryClient()
 	return useMutation({
-		mutationKey: ['slide delete'],
 		mutationFn: async (id: number) => {
-			const res = await slideService.deleteSlide(id)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await slideService.deleteSlide(id)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['slides get'] })
+			toast.success('Успішно видалено')
 		}
 	})
 }
 
 export function useCreateSlide() {
-	interface Props {
-		background: FileList
-		text: string
-		url: string
-		description: string
-		locale: string
-	}
+	const queryClient = useQueryClient()
 	return useMutation({
-		mutationKey: ['slide create'],
-		mutationFn: async (data: Props) => {
-			const formData = new FormData()
-
-			Array.from(data.background).forEach(el => {
-				formData.append('background', el)
-			})
-
-			const dataWithoutBackground = Object.entries(data).reduce((acc, [key, value]) => {
-				if (key !== 'background') acc[key] = value
-				return acc
-			}, {} as Record<string, string>)
-
-			formData.append('info', JSON.stringify(dataWithoutBackground))
-			const res = await slideService.createSlide(formData)
-			if (!res?.data) return Promise.reject()
-			return res
+		mutationFn: async (data: {
+			background: FileList
+			text: string
+			url: string
+			description: string
+			locale: string
+		}) => {
+			return await slideService.createSlide(data)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['slides get'] })
+			toast.success('Успішно створено')
 		}
 	})
 }
 
 export function useUpdateSlide() {
-	interface Props {
-		background?: FileList
-		text?: string
-		url?: string
-		description?: string
-		locale?: string
-	}
+	const queryClient = useQueryClient()
 	return useMutation({
-		mutationKey: ['slide update'],
-		mutationFn: async ({ data, id }: { data: Props; id: number }) => {
-			const formData = new FormData()
-
-			if (data.background) {
-				Array.from(data.background).forEach(el => {
-					formData.append('background', el)
-				})
+		mutationFn: async ({
+			data,
+			id
+		}: {
+			data: {
+				background?: FileList
+				text?: string
+				url?: string
+				description?: string
+				locale?: string
 			}
-			const dataWithoutBackground = Object.entries(data).reduce((acc, [key, value]) => {
-				if (key !== 'background') acc[key] = value
-				return acc
-			}, {} as Record<string, string>)
-
-			formData.append('info', JSON.stringify(dataWithoutBackground))
-			const res = await slideService.updateSlide(id, formData)
-			if (!res?.data) return Promise.reject()
-			return res
+			id: number
+		}) => {
+			return await slideService.updateSlide(id, data)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['slides get'] })
+			toast.success('Успішно оновлено')
 		}
 	})
 }

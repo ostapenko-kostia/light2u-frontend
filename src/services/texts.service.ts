@@ -4,15 +4,16 @@ import { ITextField } from '@/typing/interfaces'
 class TextsService {
 	async getAllTexts() {
 		try {
-			const res: ITextField[] | undefined = (await (
-				await fetch(`${process.env.NEXT_PUBLIC_API_URL}/texts`, {
-					method: 'GET',
-					next: {
-						revalidate: 180
-					}
-				})
-			).json()).data
-
+			const res: ITextField[] | undefined = (
+				await (
+					await fetch(`${process.env.NEXT_PUBLIC_API_URL}/texts`, {
+						method: 'GET',
+						next: {
+							revalidate: 180
+						}
+					})
+				).json()
+			).data
 
 			if (!res?.length) throw new Error('Помилка при отриманні данних')
 			return res
@@ -38,7 +39,7 @@ class TextsService {
 	}
 
 	async editText({ id, text }: { id: number; text: string }) {
-		return await api.put(`/texts/${id}`, { text })
+		return (await api.put(`/texts/${id}`, { text })).data
 	}
 }
 

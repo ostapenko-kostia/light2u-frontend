@@ -6,7 +6,7 @@ export function Footer() {
 		<footer className='py-10 grow-0 shrink-0 bg-white w-full border-t border-gray-100'>
 			<Container className='flex items-center justify-center'>
 				<span className='text-center text-sm text-gray-500 select-none'>
-					© {new Date().getFullYear()}, Light 2U. This website was developed by{' '}
+					© {new Date().getFullYear()}, Light 2U. Website developed by{" "}
 					<Link
 						href='https://ostapenko.pp.ua'
 						target='_blank'

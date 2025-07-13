@@ -1,15 +1,13 @@
 'use client'
 
-import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { Textarea } from '@/components/ui/textarea'
 import { useUpdateObject } from '@/hooks/useObjects'
 import { IObject } from '@/typing/interfaces'
-import { useQueryClient } from '@tanstack/react-query'
-import { EditIcon } from 'lucide-react'
-import { useContext, useEffect, useState } from 'react'
+import { EditIcon, Loader2 } from 'lucide-react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 interface Form {
 	images: FileList
@@ -24,8 +22,6 @@ interface Props {
 }
 
 export function AdminObjectEdit({ object }: Props) {
-	const [loadingToastId, setLoadingToastId] = useState('')
-	const queryClient = useQueryClient()
 	const { register, handleSubmit, setValue, reset } = useForm<Form>({
 		defaultValues: {
 			images: undefined,
@@ -35,32 +31,19 @@ export function AdminObjectEdit({ object }: Props) {
 			address: object.address
 		}
 	})
-	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useUpdateObject()
-	const dialogContextValues = useContext(DialogContext)
+	const { mutateAsync: editFunc, isPending } = useUpdateObject()
 
-	// Reset form when object changes
-	useEffect(() => {
-		reset({
-			images: undefined,
-			name: object.name,
-			description: object.description,
-			city: object.city,
-			address: object.address
-		})
-	}, [object, reset])
-
-	// Reset form when dialog closes
-	useEffect(() => {
-		if (!dialogContextValues?.isOpen) {
+	useEffect(
+		() =>
 			reset({
 				images: undefined,
 				name: object.name,
 				description: object.description,
 				city: object.city,
 				address: object.address
-			})
-		}
-	}, [dialogContextValues?.isOpen, object, reset])
+			}),
+		[object, reset]
+	)
 
 	const edit = async (data: Form) => {
 		await editFunc({
@@ -75,21 +58,6 @@ export function AdminObjectEdit({ object }: Props) {
 		})
 	}
 
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває зміна...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['objects get'] })
-			toast.success("Об'єкт успішно змінено!")
-		}
-		if (isError) {
-			loadingToastId && toast.dismiss(loadingToastId)
-		}
-	}, [isPending, isSuccess, isError])
-
 	return (
 		<Dialog
 			title="Змінити об'єкт"
@@ -101,7 +69,11 @@ export function AdminObjectEdit({ object }: Props) {
 		>
 			<form
 				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-4'
-				onSubmit={handleSubmit(data => edit(data))}
+				onSubmit={handleSubmit(async data => {
+					try {
+						await edit(data)
+					} catch {}
+				})}
 			>
 				<div>
 					<label
@@ -188,9 +160,10 @@ export function AdminObjectEdit({ object }: Props) {
 
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+					disabled={isPending}
 				>
-					Змінити
+					{isPending ? <Loader2 className='animate-spin' /> : 'Змінити'}
 				</button>
 			</form>
 		</Dialog>

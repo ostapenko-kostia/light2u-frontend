@@ -12,11 +12,11 @@ class AdminService {
 		Cookies.set(TOKEN.ADMIN_ACCESS_TOKEN, res.data.accessToken, {
 			expires: new Date().getDay() + 1
 		})
-		return res
+		return res.data
 	}
 
 	async createAdmin(email: string, password: string) {
-		return await api.post('/admins/create', { email, password })
+		return (await api.post('/admins/create', { email, password })).data
 	}
 
 	async getAllAdmins() {
@@ -28,7 +28,7 @@ class AdminService {
 	}
 
 	async deleteAdmin(id: number) {
-		return await api.delete(`/admins/${id}`)
+		return (await api.delete(`/admins/${id}`)).data
 	}
 }
 

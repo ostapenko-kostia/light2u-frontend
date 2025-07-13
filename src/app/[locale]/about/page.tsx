@@ -11,7 +11,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 	const { locale } = await params
 	const { t } = await getServerTranslation(locale)
 	return (
-		<div className='min-h-screen'>
+		<div className='min-h-screen animation-opacity'>
 			<AboutHero t={t} />
 			<AboutIntroduction t={t} />
 			<AboutPhilosophy t={t} />

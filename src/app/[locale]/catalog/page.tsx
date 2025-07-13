@@ -50,7 +50,7 @@ export default async function CatalogPage({
 	const showProducts = secondLevelCategory || search?.length
 
 	return (
-		<section className='py-12'>
+		<section className='py-12 animation-opacity'>
 			<Container>
 				<PageHeader
 					title={pageTitle}

@@ -1,12 +1,9 @@
 'use client'
 
-import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { useAdminCreate } from '@/hooks/useAdmin'
-import { useQueryClient } from '@tanstack/react-query'
-import { LockIcon, MailIcon, PlusIcon } from 'lucide-react'
-import { useContext, useEffect, useState } from 'react'
+import { Loader2, LockIcon, MailIcon, PlusIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 interface Form {
 	email: string
@@ -14,29 +11,8 @@ interface Form {
 }
 
 export function CreateAdmin() {
-	const [loadingToastId, setLoadingToastId] = useState('')
-	const { register, handleSubmit } = useForm<Form>()
-	const queryClient = useQueryClient()
-	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useAdminCreate()
-	const dialogContextValues = useContext(DialogContext)
-	const closeDialog = dialogContextValues?.closeDialog
-
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває створення...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['admins get'] })
-			toast.success('Адміна успішно створено!')
-			closeDialog?.()
-		}
-		if (isError) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			closeDialog?.()
-		}
-	}, [isPending, isSuccess, isError])
+	const { register, handleSubmit, reset } = useForm<Form>()
+	const { mutateAsync: createFunc, isPending } = useAdminCreate()
 
 	return (
 		<Dialog
@@ -53,7 +29,12 @@ export function CreateAdmin() {
 		>
 			<form
 				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-8'
-				onSubmit={handleSubmit(data => createFunc(data))}
+				onSubmit={handleSubmit(async data => {
+					try {
+						await createFunc(data)
+						reset()
+					} catch {}
+				})}
 			>
 				<div className='flex items-start flex-col gap-3'>
 					<label
@@ -89,9 +70,10 @@ export function CreateAdmin() {
 				</div>
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min mx-auto rounded-md px-12 py-2 hover:bg-gray-700'
+					disabled={isPending}
+					className='bg-gray-800 text-white w-min mx-auto rounded-md px-12 py-2 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
 				>
-					Створити
+					{isPending ? <Loader2 className='animate-spin' /> : 'Створити'}
 				</button>
 			</form>
 		</Dialog>

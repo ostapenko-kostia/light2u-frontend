@@ -11,19 +11,50 @@ class SlideService {
 	}
 
 	async deleteSlide(id: number) {
-		return await api.delete(`/slides/${id}`)
+		return (await api.delete(`/slides/${id}`)).data
 	}
 
-	async createSlide(data: FormData) {
-		return await api.post('/slides', data, {
-			headers: { 'Content-Type': 'multipart/form-data' }
-		})
+	async createSlide(data: {
+		background: FileList
+		text: string
+		url: string
+		description: string
+		locale: string
+	}) {
+		const formData = new FormData()
+		const { background, ...rest } = data
+
+		Array.from(background).forEach(el => formData.append('background', el))
+		formData.append('info', JSON.stringify(rest))
+
+		return (
+			await api.post('/slides', formData, {
+				headers: { 'Content-Type': 'multipart/form-data' }
+			})
+		).data
 	}
 
-	async updateSlide(id: number, data: FormData) {
-		return await api.put(`/slides/${id}`, data, {
-			headers: { 'Content-Type': 'multipart/form-data' }
-		})
+	async updateSlide(
+		id: number,
+		data: {
+			background?: FileList
+			text?: string
+			url?: string
+			description?: string
+			locale?: string
+		}
+	) {
+		const formData = new FormData()
+		const { background, ...rest } = data
+
+		if (background) Array.from(background).forEach(el => formData.append('background', el))
+		formData.append('info', JSON.stringify(rest))
+
+		return (
+			await api.put(`/slides/${id}`, formData, {
+				headers: { 'Content-Type': 'multipart/form-data' }
+			})
+		).data
 	}
 }
 

@@ -1,13 +1,12 @@
 'use client'
 
-import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { useUpdateProduct } from '@/hooks/useProducts'
 import { IProduct, IProductInfo } from '@/typing/interfaces'
-import { ArrowDownIcon, ArrowUpIcon, EditIcon, PlusIcon, Trash2Icon } from 'lucide-react'
-import { useContext, useEffect, useState } from 'react'
+import { ArrowDownIcon, ArrowUpIcon, EditIcon, Loader2, PlusIcon, Trash2Icon } from 'lucide-react'
+import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 interface Form {
 	name?: string
@@ -24,7 +23,6 @@ interface Props {
 }
 
 export function AdminProductEdit({ product }: Props) {
-	const [loadingToastId, setLoadingToastId] = useState('')
 	const { register, handleSubmit, setValue, control, reset } = useForm<Form>({
 		defaultValues: {
 			name: product.name,
@@ -41,11 +39,8 @@ export function AdminProductEdit({ product }: Props) {
 		control,
 		name: 'productInfo'
 	})
-	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useUpdateProduct()
-	const dialogContextValues = useContext(DialogContext)
-	const closeDialog = dialogContextValues?.closeDialog
+	const { mutateAsync: editFunc, isPending } = useUpdateProduct()
 
-	// Reset form when product changes
 	useEffect(() => {
 		reset({
 			name: product.name,
@@ -65,28 +60,6 @@ export function AdminProductEdit({ product }: Props) {
 		)
 	}, [product, reset, replace])
 
-	// Reset form when dialog closes
-	useEffect(() => {
-		if (!dialogContextValues?.isOpen) {
-			reset({
-				name: product.name,
-				price: product.price,
-				description: product.description,
-				quantity: product.quantity ?? 0,
-				productInfo: product.info.map(info => ({
-					key: info.key,
-					value: info.value
-				}))
-			})
-			replace(
-				product.info.map(info => ({
-					key: info.key,
-					value: info.value
-				}))
-			)
-		}
-	}, [dialogContextValues?.isOpen, product, reset, replace])
-
 	const edit = async (data: Form) => {
 		data.locale = product.locale
 		await editFunc({
@@ -105,23 +78,6 @@ export function AdminProductEdit({ product }: Props) {
 			}
 		})
 	}
-
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває зміна...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && toast.dismiss(loadingToastId)
-			window.location.reload()
-			toast.success('Товар успішно змінено')
-			closeDialog?.()
-		}
-		if (isError) {
-			loadingToastId && toast.dismiss(loadingToastId)
-			closeDialog?.()
-		}
-	}, [isPending, isSuccess, isError])
 
 	const addProductInfo = () => {
 		append({ key: '', value: '' })
@@ -156,7 +112,11 @@ export function AdminProductEdit({ product }: Props) {
 		>
 			<form
 				className='bg-white rounded-md h-min w-full flex flex-col gap-4 px-2 sm:px-4'
-				onSubmit={handleSubmit(data => edit(data))}
+				onSubmit={handleSubmit(async data => {
+					try {
+						await edit(data)
+					} catch {}
+				})}
 			>
 				<div className='flex flex-col gap-2'>
 					<label>Зображення</label>
@@ -286,9 +246,10 @@ export function AdminProductEdit({ product }: Props) {
 
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+					disabled={isPending}
 				>
-					Зберегти
+					{isPending ? <Loader2 className='animate-spin' /> : 'Зберегти'}
 				</button>
 			</form>
 		</Dialog>

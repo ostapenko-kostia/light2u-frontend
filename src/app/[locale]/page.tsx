@@ -22,7 +22,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 	)
 
 	return (
-		<section>
+		<section className='animation-opacity'>
 			<Hero slides={localizedSlides} />
 			<HomeCategories
 				categories={firstLevelCategories}

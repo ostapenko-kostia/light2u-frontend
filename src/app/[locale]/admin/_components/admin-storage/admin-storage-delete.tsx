@@ -1,10 +1,8 @@
 'use client'
 
-import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { useDeleteFile } from '@/hooks/useStorage'
-import { useQueryClient } from '@tanstack/react-query'
-import { useContext, useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { Loader2 } from 'lucide-react'
 import { IFile } from './admin-storage.typing'
 
 interface Props {
@@ -12,28 +10,7 @@ interface Props {
 }
 
 export function DeleteFile({ file }: Props) {
-	const [loadingToastId, setLoadingToastId] = useState('')
-	const dialogContextValues = useContext(DialogContext)
-	const closeDialog = dialogContextValues?.closeDialog
-	const queryClient = useQueryClient()
-	const { mutateAsync: deleteFunc, isPending, isSuccess, isError } = useDeleteFile()
-
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває видалення...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			toast.success('Файл успішно видалено!')
-			queryClient.invalidateQueries({ queryKey: ['files get'] })
-			closeDialog?.()
-		}
-		if (isError) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			closeDialog?.()
-		}
-	}, [isPending, isSuccess, isError])
+	const { mutateAsync: deleteFunc, isPending } = useDeleteFile()
 
 	return (
 		<Dialog
@@ -44,10 +21,15 @@ export function DeleteFile({ file }: Props) {
 				<p>Ви дійсно хочете видалити файл {file.title}?</p>
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min self-end rounded-md px-6 py-2 hover:bg-gray-700'
-					onClick={() => deleteFunc(file.title)}
+					className='bg-gray-800 text-white w-min self-end rounded-md px-6 py-2 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+					disabled={isPending}
+					onClick={async () => {
+						try {
+							await deleteFunc(file.title)
+						} catch {}
+					}}
 				>
-					Видалити
+					{isPending ? <Loader2 className='animate-spin' /> : 'Видалити'}
 				</button>
 			</div>
 		</Dialog>

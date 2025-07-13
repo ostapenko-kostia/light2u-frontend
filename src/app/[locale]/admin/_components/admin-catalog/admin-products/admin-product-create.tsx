@@ -1,17 +1,15 @@
 'use client'
 
-import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateProduct } from '@/hooks/useProducts'
 import { ISecondLevelCategory } from '@/typing/interfaces'
-import { useQueryClient } from '@tanstack/react-query'
-import { ArrowDownIcon, ArrowUpIcon, PlusCircleIcon, PlusIcon, Trash2Icon } from 'lucide-react'
-import { useContext, useEffect, useState } from 'react'
+import { ArrowDownIcon, ArrowUpIcon, Loader2, PlusCircleIcon, PlusIcon, Trash2Icon } from 'lucide-react'
+import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 interface ProductInfo {
 	key: string
@@ -35,9 +33,7 @@ interface Props {
 }
 
 export function AdminProductCreate({ category, locale }: Props) {
-	const [loadingToastId, setLoadingToastId] = useState('')
-	const queryClient = useQueryClient()
-	const { register, handleSubmit, setValue, control } = useForm<Form>({
+	const { register, handleSubmit, setValue, control, reset } = useForm<Form>({
 		defaultValues: {
 			productInfo: []
 		}
@@ -46,31 +42,12 @@ export function AdminProductCreate({ category, locale }: Props) {
 		control,
 		name: 'productInfo'
 	})
-	const { mutateAsync: createFunc, isPending, isSuccess, isError } = useCreateProduct()
-	const dialogContextValues = useContext(DialogContext)
-	const closeDialog = dialogContextValues?.closeDialog
+	const { mutateAsync: createFunc, isPending } = useCreateProduct()
 
 	useEffect(() => {
 		setValue('locale', locale)
 		setValue('categorySlug', category!.slug)
 	}, [locale, category, setValue])
-
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває створення...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['products get'] })
-			toast.success('Товар створено успішно')
-			closeDialog?.()
-		}
-		if (isError) {
-			loadingToastId && toast.dismiss(loadingToastId)
-			closeDialog?.()
-		}
-	}, [isPending, isSuccess, isError])
 
 	const create = async (data: Form) => {
 		await createFunc({
@@ -120,7 +97,12 @@ export function AdminProductCreate({ category, locale }: Props) {
 		>
 			<form
 				className='bg-white rounded-md h-min flex flex-col gap-4 w-full px-2 sm:px-4'
-				onSubmit={handleSubmit(data => create(data))}
+				onSubmit={handleSubmit(async data => {
+					try {
+						await create(data)
+						reset()
+					} catch {}
+				})}
 			>
 				<div className='flex flex-col gap-2'>
 					<FileInput
@@ -250,9 +232,10 @@ export function AdminProductCreate({ category, locale }: Props) {
 
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+					disabled={isPending}
 				>
-					Створити
+					{isPending ? <Loader2 className='animate-spin' /> : 'Створити'}
 				</button>
 			</form>
 		</Dialog>

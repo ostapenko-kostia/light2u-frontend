@@ -1,5 +1,6 @@
 import { fileService } from '@/services/files.service'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 export function useGetFiles() {
 	return useQuery({
@@ -10,28 +11,27 @@ export function useGetFiles() {
 }
 
 export function useDeleteFile() {
+	const queryClient = useQueryClient()
 	return useMutation({
-		mutationKey: ['delete file'],
 		mutationFn: async (file: string) => {
-			const res = await fileService.deleteFile(file)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await fileService.deleteFile(file)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['files get'] })
+			toast.success('Успішно видалено')
 		}
 	})
 }
 
 export function useCreateFile() {
+	const queryClient = useQueryClient()
 	return useMutation({
-		mutationKey: ['create file'],
-		mutationFn: async (data: { file: FileList; name: string }) => {
-			const formData = new FormData()
-
-			formData.append('name', JSON.stringify(data.name))
-			formData.append('file', data.file[0])
-
-			const res = await fileService.createFile(formData)
-			if (!res?.data) return Promise.reject()
-			return res
+		mutationFn: async (file: FileList) => {
+			return await fileService.createFile(file)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['files get'] })
+			toast.success('Успішно завантажено')
 		}
 	})
 }

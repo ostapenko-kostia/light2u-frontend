@@ -1,13 +1,12 @@
 'use client'
 
-import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { FileInput } from '@/components/ui/file-input'
 import { useEditFirstLevelCategory, useEditSecondLevelCategory } from '@/hooks/useCategories'
 import { IFirstLevelCategory, ISecondLevelCategory } from '@/typing/interfaces'
-import { EditIcon } from 'lucide-react'
-import { useContext, useEffect, useState } from 'react'
+import { EditIcon, Loader2 } from 'lucide-react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 interface Props {
 	category: IFirstLevelCategory | ISecondLevelCategory
@@ -22,7 +21,6 @@ interface Form {
 }
 
 export function AdminEditCategory({ category }: Props) {
-	const [loadingToastId, setLoadingToastId] = useState('')
 	const { register, handleSubmit, setValue, reset } = useForm<Form>({
 		defaultValues: {
 			name: {
@@ -31,26 +29,13 @@ export function AdminEditCategory({ category }: Props) {
 			}
 		}
 	})
-	const {
-		mutateAsync: editFirstLevelFunc,
-		isPending: isFirstLevelPending,
-		isSuccess: isFirstLevelSuccess,
-		isError: isFirstLevelError
-	} = useEditFirstLevelCategory()
-	const {
-		mutateAsync: editSecondLevelFunc,
-		isPending: isSecondLevelPending,
-		isSuccess: isSecondLevelSuccess,
-		isError: isSecondLevelError
-	} = useEditSecondLevelCategory()
-	const dialogContextValues = useContext(DialogContext)
-	const closeDialog = dialogContextValues?.closeDialog
+	const { mutateAsync: editFirstLevelFunc, isPending: isFirstLevelPending } =
+		useEditFirstLevelCategory()
+	const { mutateAsync: editSecondLevelFunc, isPending: isSecondLevelPending } =
+		useEditSecondLevelCategory()
 
 	const isPending = isFirstLevelPending || isSecondLevelPending
-	const isSuccess = isFirstLevelSuccess || isSecondLevelSuccess
-	const isError = isFirstLevelError || isSecondLevelError
 
-	// Reset form when category changes
 	useEffect(() => {
 		reset({
 			name: {
@@ -59,35 +44,6 @@ export function AdminEditCategory({ category }: Props) {
 			}
 		})
 	}, [category, reset])
-
-	// Reset form when dialog closes
-	useEffect(() => {
-		if (!dialogContextValues?.isOpen) {
-			reset({
-				name: {
-					uk: (category.name as { uk: string }).uk,
-					ru: (category.name as { ru: string }).ru
-				}
-			})
-		}
-	}, [dialogContextValues?.isOpen, category, reset])
-
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває зміна...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			toast.success('Категорію успішно змінено!')
-			window.location.reload()
-			closeDialog?.()
-		}
-		if (isError) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			closeDialog?.()
-		}
-	}, [isPending, isSuccess, isError])
 
 	const edit = async (data: Form) => {
 		const formData = {
@@ -98,13 +54,11 @@ export function AdminEditCategory({ category }: Props) {
 		}
 
 		if ('parentCategorySlug' in category) {
-			// This is a second level category - keep the existing parentCategorySlug
 			await editSecondLevelFunc({
 				...formData,
 				parentCategorySlug: category.parentCategorySlug
 			})
 		} else {
-			// This is a first level category
 			await editFirstLevelFunc(formData)
 		}
 	}
@@ -120,7 +74,11 @@ export function AdminEditCategory({ category }: Props) {
 		>
 			<form
 				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-8'
-				onSubmit={handleSubmit(data => edit(data))}
+				onSubmit={handleSubmit(async data => {
+					try {
+						await edit(data)
+					} catch {}
+				})}
 			>
 				<div>
 					<FileInput
@@ -166,9 +124,10 @@ export function AdminEditCategory({ category }: Props) {
 				</div>
 				<button
 					type='submit'
-					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+					disabled={isPending}
 				>
-					Зберегти
+					{isPending ? <Loader2 className='animate-spin' /> : 'Зберегти'}
 				</button>
 			</form>
 		</Dialog>

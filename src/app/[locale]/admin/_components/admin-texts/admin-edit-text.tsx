@@ -1,13 +1,12 @@
 'use client'
 
-import { Dialog, DialogContext } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { useEditText } from '@/hooks/useText'
 import { ITextField } from '@/typing/interfaces'
-import { useQueryClient } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 interface Props {
 	text: ITextField
@@ -18,56 +17,18 @@ interface Form {
 }
 
 function AdminEditTextComponent({ text }: Props) {
-	const [loadingToastId, setLoadingToastId] = useState('')
-	const { register, handleSubmit, watch, setValue, reset } = useForm<Form>({
+	const { register, handleSubmit, reset } = useForm<Form>({
 		defaultValues: {
 			text: text.text
 		}
 	})
-	const queryClient = useQueryClient()
-	const { mutateAsync: editFunc, isPending, isSuccess, isError } = useEditText()
-	const dialogContextValues = useContext(DialogContext)
-	const closeDialog = dialogContextValues?.closeDialog
+	const { mutateAsync: editFunc, isPending } = useEditText()
 
-	// Reset form when text changes
 	useEffect(() => {
 		reset({
 			text: text.text
 		})
 	}, [text, reset])
-
-	// Reset form when dialog closes
-	useEffect(() => {
-		if (!dialogContextValues?.isOpen) {
-			reset({
-				text: text.text
-			})
-		}
-	}, [dialogContextValues?.isOpen, text, reset])
-
-	useEffect(() => {
-		if (isPending) {
-			const loadingToastId = toast.loading('Триває зміна...')
-			setLoadingToastId(loadingToastId)
-		}
-		if (isSuccess) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			queryClient.invalidateQueries({ queryKey: ['texts get'] })
-			toast.success('Текст успішно змінено!')
-			closeDialog?.()
-		}
-		if (isError) {
-			loadingToastId && loadingToastId && toast.dismiss(loadingToastId)
-			closeDialog?.()
-		}
-	}, [isPending, isSuccess, isError])
-
-	const edit = async (data: Form) => {
-		await editFunc({
-			id: Number(text.id),
-			text: data.text ?? undefined
-		})
-	}
 
 	return (
 		<Dialog
@@ -76,7 +37,13 @@ function AdminEditTextComponent({ text }: Props) {
 		>
 			<form
 				className='bg-white rounded-md p-4 w-full h-min flex flex-col gap-8'
-				onSubmit={handleSubmit(data => edit(data))}
+				onSubmit={handleSubmit(async data => {
+					await editFunc({
+						id: Number(text.id),
+						text: data.text ?? undefined
+					})
+					reset()
+				})}
 			>
 				<div className='flex items-start flex-col gap-3'>
 					<label
@@ -97,8 +64,9 @@ function AdminEditTextComponent({ text }: Props) {
 				<button
 					type='submit'
 					className='bg-gray-800 text-white w-min px-12 py-2 rounded-md mx-auto hover:bg-gray-700'
+					disabled={isPending}
 				>
-					Зберегти
+					{isPending ? <Loader2 className='animate-spin' /> : 'Зберегти'}
 				</button>
 			</form>
 		</Dialog>

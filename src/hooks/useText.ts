@@ -1,13 +1,16 @@
 import { textsService } from '@/services/texts.service'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 export function useEditText() {
+	const queryClient = useQueryClient()
 	return useMutation({
-		mutationKey: ['edit text'],
 		mutationFn: async (data: { id: number; text: string }) => {
-			const res = await textsService.editText(data)
-			if (!res?.data) return Promise.reject()
-			return res
+			return await textsService.editText(data)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['texts get'] })
+			toast.success('Успішно оновлено')
 		}
 	})
 }

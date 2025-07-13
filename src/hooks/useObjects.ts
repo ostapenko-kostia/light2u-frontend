@@ -1,5 +1,6 @@
 import { objectsService } from '@/services/objects.service'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 export function useGetObjects() {
 	return useQuery({
@@ -26,16 +27,20 @@ export function useGetObjectBySlug(slug: string) {
 }
 
 export function useDeleteObject() {
+	const queryClient = useQueryClient()
 	return useMutation({
-		mutationKey: ['object delete'],
 		mutationFn: async (id: number) => {
-			const ok = await objectsService.deleteObject(id)
-			if (!ok) return Promise.reject()
+			return await objectsService.deleteObject(id)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['objects get'] })
+			toast.success('Успішно видалено')
 		}
 	})
 }
 
 export function useCreateObject() {
+	const queryClient = useQueryClient()
 	interface Props {
 		images: FileList
 		name: string
@@ -45,16 +50,18 @@ export function useCreateObject() {
 		locale: string
 	}
 	return useMutation({
-		mutationKey: ['object create'],
 		mutationFn: async (data: Props) => {
-			const res = await objectsService.createObject(data)
-			if (!res.ok) return Promise.reject()
-			return res
+			return await objectsService.createObject(data)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['objects get'] })
+			toast.success('Успішно створено')
 		}
 	})
 }
 
 export function useUpdateObject() {
+	const queryClient = useQueryClient()
 	interface Props {
 		images?: FileList
 		name?: string
@@ -63,11 +70,12 @@ export function useUpdateObject() {
 		address?: string
 	}
 	return useMutation({
-		mutationKey: ['object update'],
 		mutationFn: async ({ data, id }: { data: Props; id: number }) => {
-			const res = await objectsService.updateObject(id, data)
-			if (!res.ok) return Promise.reject()
-			return res
+			return await objectsService.updateObject(id, data)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['objects get'] })
+			toast.success('Успішно оновлено')
 		}
 	})
 }
